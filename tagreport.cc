@@ -27,7 +27,6 @@
 #include <sstream>
 #include <fstream>
 #include <string>
-#include <algorithm>
 
 /* C/C++ hybrids. */
 #include <cassert>
@@ -221,14 +220,6 @@ vector<struct Song*>* traverse_dir (char* begin)
         /* will be used in all cases */
         struct Song * tmpsong = new struct Song;
 	string ext = fn;
-	string::iterator e;
-        
-	/* Grab the first three letters of the extension (if possible)
-	 * and store it in ext as lowercase. */
-        ext = ext.substr(ext.rfind('.') + 1, 3);
-
-	for (e = ext.begin(); e != ext.end(); e++)
-          *e = tolower(*e);
 		
 	/* Skip filenames with no extension */
         if (fn.find('.') == string::npos)
@@ -248,9 +239,20 @@ vector<struct Song*>* traverse_dir (char* begin)
           delete tmpsong;
           continue;
         }
-	
+
+	else
+	{
+	  string::iterator e;
+          /* Grab the first three letters of the extension (if possible)
+           * and store it in ext as lowercase. */
+          ext = ext.substr(ext.rfind('.') + 1, 3);
+        
+          for (e = ext.begin(); e != ext.end(); e++)
+            *e = tolower(*e);
+	}
+
         /* Ogg Vorbis or MP3 file? */
-        else if (ext == "ogg" || ext == "mp3")
+        if (ext == "ogg" || ext == "mp3")
         {
           TagLib::FileRef ref (fp.str().c_str());
 
