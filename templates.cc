@@ -8,17 +8,13 @@
 
 using namespace std;
 
-/* Define variables previously extern'd */
-key template_title ("TagReport Generated Playlist");
-key template_head_body; /* unset by default */
-key template_body_tag ("<body bgcolor=\"#000000\" text=\"#FFFFFF\">");
-key template_header; /* unset by default */
-key template_stats ("<h2>$directory</h2><hr />\n\
-<p>Generated at $date <br />\n\
-Scanned $count songs.</p>");
-key template_prebody ("<p>");
-key template_body ("$num. $a-t<br />");
-key template_footer ("</p>");
+#include "default.h"
+
+/* Default templates */
+key template_title (DEFAULT_TITLE), template_body_tag(DEFAULT_BODY_TAG);
+key template_stats (DEFAULT_STATS), template_prebody(DEFAULT_PREBODY);
+key template_body (DEFAULT_BODY), template_footer(DEFAULT_FOOTER);
+key template_head_body, template_header; /* unset by default */
 
 FILE * template_file = NULL;
 
