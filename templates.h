@@ -32,8 +32,8 @@ struct map_dollars
   int term_length;
 };
 
-extern struct map_dollars header_map[];
-extern struct map_dollars body_map[];
+extern const struct map_dollars header_map[];
+extern const struct map_dollars body_map[];
 
 extern key template_title;
 extern key template_header;
