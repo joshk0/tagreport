@@ -171,7 +171,7 @@ int main (int argc, char* argv [])
   /* Scan the current directory tree by default. */
   else
   {
-    target = (char*)malloc(PATH_MAX + 1);;
+    target = (char*)malloc(PATH_MAX + 1);
     getcwd(target, PATH_MAX);
     targets.push_back(target);
   }
