@@ -60,7 +60,7 @@ CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
 AC_CHECK_FUNCS(getopt_long)
-AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
 
