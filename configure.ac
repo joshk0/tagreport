@@ -11,6 +11,7 @@ YACC_LANG=CXX
 
 AC_PROG_LEX
 AC_PROG_YACC
+AC_PROG_INSTALL
 
 AC_MSG_CHECKING([for location of TagLib includes])
 for dir in /usr /usr/local /opt; do

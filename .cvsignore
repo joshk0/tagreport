@@ -2,9 +2,14 @@ a.out
 core
 tagreport
 playlist.htm
+Makefile
 y.tab.*
 lex.yy.*
 .depend
 config.h
 config.h.in
+config.log
+config.status
 configure
+install-sh
+autom4te.cache
