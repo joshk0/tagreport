@@ -71,10 +71,7 @@ void traverse_dir (char* begin)
       /* Skip .. and . */
       if (!strcmp(contents->d_name, ".") || !strcmp(contents->d_name, ".."))
       {
-#ifdef DEBUG
-        fprintf(stderr, "DEBUG: Not recursing into dot-dir '%s'\n", contents->d_name);
-#endif
-	free(fullpath);
+        free(fullpath);
         continue;
       }
 
@@ -91,30 +88,30 @@ void traverse_dir (char* begin)
       else {
         /* Skip filenames with no extension */
         if ((comp = strrchr(contents->d_name, '.')) == NULL)
-	{
+        {
 #ifdef DEBUG
-	  fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
+          fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
 #endif
-	  free(fullpath);
+          free(fullpath);
           continue;
-	}
-	
-	/* Ogg Vorbis or MP3 file? */
+        }
+        
+        /* Ogg Vorbis or MP3 file? */
         if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
-	    || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
+            || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
           TagLib::FileRef ref (fullpath);
 
-	  if(ref.isNull())
-	    abort();
+          if(ref.isNull())
+            abort();
 
-  	  tag = ref.tag();
+            tag = ref.tag();
 #ifdef DEBUG
           printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());
 #endif
-	}
-	
+        }
+        
 #ifdef DEBUG
-	/* Note that we did not do anything with this file */
+        /* Note that we did not do anything with this file */
         else {
           fprintf(stderr, "DEBUG: skipping unrecognized file %s\n", contents->d_name, contents->d_type);
         }
