@@ -1,4 +1,4 @@
-/* Parser for .def files for TagReport. */
+/* Lexical analyzer for .def files for TagReport. */
 
 %option nounput
 %option noyywrap

@@ -89,7 +89,7 @@ int main (int argc, char* argv [])
         if ((template_file = fopen (optarg, "r")) == NULL)
        {
           cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
-         return 1;
+          return 1;
        }
        else
        {
@@ -431,5 +431,3 @@ void clean (vector<struct Song *> * root)
 
   delete root;
 }
-
-
