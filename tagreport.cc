@@ -93,6 +93,7 @@ int main (int argc, char* argv [])
           yyparse();
           fclose (template_file);
 	}
+	break;
         
       case '?':
         return 1;
@@ -113,15 +114,7 @@ int main (int argc, char* argv [])
   {
     unsigned int i;
     ofstream out;
-    struct tm *now;
-    time_t now_secs;
-    char now_date[18];
-
-    /* Get the current time */
-    time(&now_secs);
-    now = localtime(&now_secs);
-    strftime (now_date, 18, "%H:%M, %F", now);
-    
+        
     /* Default output location - $PWD/playlist.htm */
     if (!outfile)
       outfile = strdup("playlist.htm");
@@ -148,10 +141,18 @@ int main (int argc, char* argv [])
       cout << endl;
     
     /* Some statistics ... */
-    out << target << "</h2><hr />" << endl;
-    out << "<p>Generated at " << now_date << "<br />" << endl;
-    out << "Scanned " << all_songs->size() << " songs.</p>" << endl;
-    out << "<p>";
+    
+    if (template_stats.is_set())
+    {
+      out << replace_header (all_songs->size());
+    }
+    else
+    {
+      out << target << "</h2><hr />" << endl;
+      out << "<p>Generated at " << now_date << "<br />" << endl;
+      out << "Scanned " << all_songs->size() << " songs.</p>" << endl;
+      out << "<p>";
+    }
     
     /* Loop through the vector and HTML-output its contents. */
     for (i = 0; i < all_songs->size(); i++)

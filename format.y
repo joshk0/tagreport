@@ -73,7 +73,7 @@ KeyPair: KeyType '=' TYPE_VALUE {
       break;
 
     default: /* should NEVER ever ever happen */
-      cout << "OWNED: received " << $1 << " in switch" << endl; 
+      cout << "FATAL: received unexpected " << $1 << " in switch" << endl; 
       abort();
   }
 }

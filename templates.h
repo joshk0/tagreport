@@ -40,8 +40,8 @@ extern key template_body;
 
 extern FILE * template_file;
 
-bool replace_header (string & in, int count, const string & directory);
-bool replace_body (string & in, const string & artist, const string & title);
+string replace_header (int count, const string & directory);
+string replace_body (const string & artist, const string & title);
 
 #endif
 

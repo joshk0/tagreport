@@ -22,12 +22,12 @@ struct map_dollars body_map[] = {
   { "$title", TITLE },
 };
 
-bool replace_header (string & in, int count, const string & directory)
+string replace_header (int count, const string & directory)
 {
   return true;
 }
 
-bool replace_body (string & in, const string & artist, const string & title)
+string replace_body (string in, const string & artist, const string & title)
 {
   return true;
 }
