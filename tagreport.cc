@@ -74,7 +74,8 @@ int main (int argc, char* argv [])
     { "help"    , 0, 0, 'h' },
     { "template", 0, 0, 't' },
     { "output"  , 0, 0, 'o' },
-    { "verbose" , 0, 0, 'v' }
+    { "verbose" , 0, 0, 'v' },
+    { 0, 0, 0, 0 }
   };
 #endif
   
@@ -82,9 +83,9 @@ int main (int argc, char* argv [])
   
   /* read all options - for now only -o */
 #ifdef HAVE_GETOPT_LONG
-  while ((opt = getopt(argc, argv, "ht:o:v")) != -1)
-#else
   while ((opt = getopt_long(argc, argv, "ht:o:v", longopts, NULL)) != -1)
+#else
+  while ((opt = getopt(argc, argv, "ht:o:v")) != -1)
 #endif
   {
     switch(opt)
