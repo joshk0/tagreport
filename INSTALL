@@ -7,6 +7,7 @@ TagReport installation
 * GNU g++, or any other ISO C++ compiler, probably works..
 * flex and bison (any recent versions should do)
 * Some kind of getopt implementation.
+* metaflac (part of the flac distribution) if you want FLAC support
 * TagLib. Please retrieve the source from:
 
     http://ktown.kde.org/~wheeler/taglib/taglib-cvs.tar.gz

@@ -11,6 +11,9 @@ TagReport handles scanning multiple entire directory hierarchies, but
 currently can only handle reading MP3s and Ogg Vorbis audio files, unlike
 xmms which can be made to read everything under the sun with the right plugins.
 
+Also, the FLAC (Free Lossless Audio Codec) is supported if the metaflac program 
+is available on your system at build time.
+
 It also has support for customizable HTML templates. For more information
 on this simple file format look at def/sample.def.
 
