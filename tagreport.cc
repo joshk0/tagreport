@@ -231,8 +231,6 @@ int main (int argc, char* argv [])
   /* Write out canned headers to the target file */
   out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
 
-  assert (template_title.is_set());
-  
   OUTPUT_HEADER(out, all_songs, target, template_title);
   out << "</title>" << endl;
 
@@ -240,12 +238,10 @@ int main (int argc, char* argv [])
   OUTPUT_HEADER_IF_SET(out, all_songs, target, template_head_body);
   out << "</head>" << endl;
 
-  assert (template_body_tag.is_set());
   OUTPUT_HEADER(out, all_songs, target, template_body_tag);
   OUTPUT_HEADER_IF_SET(out, all_songs, target, template_header);
     
   /* Some statistics ... */
-  assert (template_stats.is_set());
   OUTPUT_HEADER(out, all_songs, target, template_stats);
     
   /* Use literally. */
@@ -257,7 +253,6 @@ int main (int argc, char* argv [])
     OUTPUT_BODY(out, (*all_songs)[i], i + 1);
 
   /* Footer output. Treated as a header for processing purposes. */
-  assert (template_footer.is_set());
   OUTPUT_HEADER(out, all_songs, target, template_footer);
   out << "</body>\n</html>" << endl;
 
@@ -395,7 +390,8 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
 #ifdef USE_FLAC
   if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
   {
-    if (!get_flac(song, fn.c_str()) || (song->title == "" && song->artist == ""))
+    if (!get_flac(song, fn.c_str()) ||
+        (song->title == "" && song->artist == ""))
     {
       song->title = NOPATHEXT(fn, begin);
       htmlify(song->title);
@@ -411,7 +407,8 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
   if (ext == "ogg" || ext == "mp3")
 #endif
   {
-    if (!get_taglib(song, fn.c_str()) || (song->title == "" && song->artist == ""))
+    if (!get_taglib(song, fn.c_str()) ||
+        (song->title == "" && song->artist == ""))
     {
       song->title = NOPATHEXT(fn, begin);
       htmlify(song->title);

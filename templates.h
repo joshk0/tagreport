@@ -55,6 +55,7 @@ if ((tmpl).is_set()) \
   OUTPUT_HEADER(stream,vec,dir,tmpl)
 
 #define OUTPUT_HEADER(stream, vec, dir, tmpl) \
+  assert (tmpl.is_set()); \
   (stream) << replace_header((tmpl).get(), (vec)->size(), dir) << endl;
 
 #define OUTPUT_BODY(stream, item, num) \
