@@ -52,7 +52,6 @@ extern int yyparse (void);
 extern FILE *yyin;
 
 static vector<struct Song*>* traverse_dir (char* begin);
-static bool get_artist_title (struct Song * song, string fn, char* begin);
 
 #ifdef NDEBUG
 bool verbose = false;
@@ -75,7 +74,10 @@ int main (int argc, char* argv [])
   int opt;
   unsigned int i;
   ofstream out;
-        
+
+  /* XXX - suppress a warning */
+  (void)replacehtml;
+
 #ifdef HAVE_GETOPT_LONG
   struct option longopts [] = {
     { "help"    , 0, 0, 'h' },
@@ -357,87 +359,4 @@ vector<struct Song*>* traverse_dir (char* begin)
   closedir(root);
 
   return all_songs;
-}
-
-bool get_artist_title (struct Song * song, string fn, char * begin)
-{
-  string ext = fn;
-  
-  /* Skip filenames with no extension */
-  if (fn.rfind('.') == string::npos)
-  {
-    DEBUG("skipping extensionless file", fn);
-    return false;  
-  }
-
-  /* Extension is there, but nothing */
-  else if (fn[fn.length() - 1] == '.')
-  {
-    DEBUG("blank extension for file", fn);
-    return false;
-  }
-
-  bool (*getfunc)(struct Song*, const char*);
-  
-  /* Valid extension */
-  string::iterator e;
-  
-  /* Grab the first four letters of the extension (if possible)
-   * and store it in ext as lowercase. */
-  ext = ext.substr(ext.rfind('.') + 1, 4);
-        
-  for (e = ext.begin(); e != ext.end(); e++)
-    *e = tolower(*e);
-
-  /* Choose which function to use. */
-#ifdef USE_FLAC
-  if (ext == "flac")
-  {
-    getfunc = &get_flac;
-    goto skipextcheck;
-  }
-#endif
-#ifdef USE_OGG
-  if (ext == "ogg")
-  {
-    getfunc = &get_ogg;
-    goto skipextcheck;
-  }
-#endif
-#ifdef USE_ID3TAG
-  if (ext == "mp3")
-  {
-    getfunc = &get_mp3;
-    goto skipextcheck;
-  }
-#endif
-#if !defined(USE_ID3TAG) && defined(USE_TAGLIB)
-  if (ext == "mp3")
-  {
-    getfunc = &get_taglib;
-    goto skipextcheck;
-  }
-#endif
-#if !defined(USE_OGG) && defined(USE_TAGLIB)
-  if (ext == "ogg")
-  {
-    getfunc = &get_taglib;
-    goto skipextcheck;
-  }
-#endif
-  else
-  {
-     DEBUG ("skipping unrecognized file", fn);
-     return false;
-  }
-
-skipextcheck:
-  if (!(*getfunc)(song, fn.c_str()) || 
-      (song->title == "" && song->artist == ""))
-  {
-    song->title = NOPATHEXT(fn, begin);
-    htmlify(song->title);
-  }
-    
-  return true;
 }

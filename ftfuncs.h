@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "tagreport.h"
+#include <string>
 
 #ifdef USE_FLAC
 bool get_flac (struct Song* song, const char* path);
@@ -21,5 +22,7 @@ bool get_mp3 (struct Song * mp3, const char * path);
 #ifdef USE_TAGLIB
 bool get_taglib(struct Song* song, const char* path);
 #endif
+
+bool get_artist_title (struct Song * song, std::string fn, char* begin);
 
 #endif /* !INCLUDED_ftfuncs_h */

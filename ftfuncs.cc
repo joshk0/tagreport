@@ -43,7 +43,7 @@ bool get_flac (struct Song* flac, const char* path)
     if (FLAC__metadata_simple_iterator_get_block_type(it) ==
           FLAC__METADATA_TYPE_VORBIS_COMMENT)
     {
-      unsigned nc = 0, l = 0;
+      unsigned nc;
       
       FLAC__StreamMetadata *sm;
       FLAC__StreamMetadata_VorbisComment_Entry *e;
@@ -100,6 +100,8 @@ bool get_flac (struct Song* flac, const char* path)
 }
 #endif /* USE_FLAC */
 
+#ifdef USE_TAGLIB
+
 bool get_taglib (struct Song * song, const char *path)
 {
   TagLib::Tag *tag;
@@ -143,6 +145,8 @@ bool get_taglib (struct Song * song, const char *path)
   else /* NO TAG! */
     return false;
 }
+
+#endif /* USE_TAGLIB */
 
 #ifdef USE_OGG
 /* This is much like the FLAC support because both use the Vorbis comment
@@ -198,7 +202,7 @@ bool get_ogg (struct Song * ogg, const char * path)
   ov_clear (&ov);
   return true;
 }
-#endif
+#endif /* USE_OGG */
 
 #ifdef USE_ID3TAG
 bool get_mp3 (struct Song *mp3, const char* path)
@@ -243,4 +247,87 @@ bool get_mp3 (struct Song *mp3, const char* path)
   id3_file_close (m);
   return true;
 }
+#endif /* USE_ID3TAG */
+
+bool get_artist_title (struct Song * song, string fn, char * begin)
+{
+  string ext = fn;
+  
+  /* Skip filenames with no extension */
+  if (fn.rfind('.') == string::npos)
+  {
+    DEBUG("skipping extensionless file", fn);
+    return false;  
+  }
+
+  /* Extension is there, but nothing */
+  else if (fn[fn.length() - 1] == '.')
+  {
+    DEBUG("blank extension for file", fn);
+    return false;
+  }
+  
+  /* Valid extension */
+  string::iterator e;
+  
+  /* Grab the first four letters of the extension (if possible)
+   * and store it in ext as lowercase. */
+  ext = ext.substr(ext.rfind('.') + 1, 4);
+        
+  for (e = ext.begin(); e != ext.end(); e++)
+    *e = tolower(*e);
+
+  /* Choose which function to use. */
+  bool (*getfunc)(struct Song*, const char*);
+
+#ifdef USE_FLAC
+  if (ext == "flac")
+  {
+    getfunc = &get_flac;
+    goto skipextcheck;
+  }
 #endif
+#ifdef USE_OGG
+  if (ext == "ogg")
+  {
+    getfunc = &get_ogg;
+    goto skipextcheck;
+  }
+#endif
+#ifdef USE_ID3TAG
+  if (ext == "mp3")
+  {
+    getfunc = &get_mp3;
+    goto skipextcheck;
+  }
+#endif
+#if !defined(USE_ID3TAG) && defined(USE_TAGLIB)
+  if (ext == "mp3")
+  {
+    getfunc = &get_taglib;
+    goto skipextcheck;
+  }
+#endif
+#if !defined(USE_OGG) && defined(USE_TAGLIB)
+  if (ext == "ogg")
+  {
+    getfunc = &get_taglib;
+    goto skipextcheck;
+  }
+#endif
+  else
+  {
+     DEBUG ("skipping unrecognized file", fn);
+     return false;
+  }
+
+skipextcheck:
+  if (!(*getfunc)(song, fn.c_str()) || 
+      (song->title == "" && song->artist == ""))
+  {
+    song->title = NOPATHEXT(fn, begin);
+    htmlify(song->title);
+  }
+    
+  return true;
+}
