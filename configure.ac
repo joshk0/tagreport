@@ -36,47 +36,27 @@ fi
 
 AC_SUBST(DEBUG)
 
-AC_ARG_WITH(taglib-prefix,
-AC_HELP_STRING([--with-taglib-prefix=PATH], [Add another path to the search path for TagLib's headers.]),
-[userpath="$withval"], [])
+AC_CHECK_PROG(TAGLIB_CONFIG, taglib-config, yes)
 
-AC_MSG_CHECKING([for location of TagLib includes])
-for dir in $userpath /usr /usr/local /opt; do
-  if test -d "$dir/include/taglib"; then
-    TAGLIB_ROOT="$dir"
-    break
+if test "$ac_cv_prog_TAGLIB_CONFIG" = yes; then
+  AC_MSG_CHECKING(for TagLib compiler flags)
+  if ! test "`taglib-config --cflags`" = "-I/usr/local/include"; then
+    TAGLIB_INCLUDE="`taglib-config --cflags`"
+    AC_MSG_RESULT($TAGLIB_INCLUDE)
+  else
+    AC_MSG_RESULT(not needed)
   fi
-done
 
-datadir="$datadir/tagreport"
+  AC_MSG_CHECKING(for TagLib linker flags)
+  if ! test "`taglib-config --libs`" = "-L/usr/local/lib"; then
+    TAGLIB_LD="`taglib-config --libs`"
+    AC_MSG_RESULT($TAGLIB_LD)
+  else
+    AC_MSG_RESULT(not needed)
+  fi
 
-save_CXXFLAGS="$CXXFLAGS"
-save_CPPFLAGS="$CPPFLAGS"
-
-if test -z "$TAGLIB_ROOT"; then
-  AC_MSG_RESULT([not found])
-  CXXFLAGS="$CXXFLAGS -I/usr/local/include -L/usr/local/lib"
-  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-else
-  AC_MSG_RESULT($TAGLIB_ROOT)
-
-  CXXFLAGS="$CXXFLAGS -I/usr/local/include -I$TAGLIB_ROOT/include/taglib -L/usr/local/lib"
-  CPPFLAGS="$CPPFLAGS -I/usr/local/include -I$TAGLIB_ROOT/include/taglib"
-
-  AC_CHECK_HEADER(tag.h,
-  [
-    AC_CHECK_HEADER(fileref.h,
-    [
-      AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
-      BLIBS="$BLIBS -ltag"
-      TAGLIB_INCLUDE="-I\$(TAGLIB_ROOT)/include/taglib"
-      TAGLIB_LD="-L\$(TAGLIB_ROOT)/lib"
-      use_TAGLIB=1
-    ])
-  ])
-  
-  CXXFLAGS="$save_CXXFLAGS -I/usr/local/include -L/usr/local/lib"
-  CPPFLAGS="$save_CPPFLAGS -I/usr/local/include"
+  AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
+  use_TAGLIB=1
 fi
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
@@ -174,9 +154,6 @@ AC_SUBST(TAGLIB_INCLUDE)
 AC_SUBST(TAGLIB_LD)
 AC_SUBST(TAGLIB_ROOT)
 AC_SUBST(BLIBS)
-
-CXXFLAGS="$save_CXXFLAGS"
-CPPFLAGS="$save_CPPFLAGS"
 
 AC_CONFIG_FILES(Makefile)
 
