@@ -2,10 +2,13 @@
 # define _GNU_SOURCE // asprintf, basename...
 #endif
 
+#define _USE_BSD
+
 #define DEBUG
 
 #include <taglib/vorbisfile.h>
 #include <taglib/mpegfile.h>
+#include <taglib/fileref.h>
 #include <taglib/tag.h>
 #include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
@@ -14,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -47,9 +51,10 @@ void traverse_dir (char* begin)
 {
   /* XXX NOT DONE XXX */
   DIR* root;
-  TagLib::Tag * tag;
   struct dirent * contents;
+  struct stat dino;
   char *comp, *fullpath = NULL;
+  TagLib::Tag *tag;
   
   if ((root = opendir(begin)) != NULL) {
     /* DURRRRRRRRRRRRRRRRRRR  not done yet */
@@ -58,32 +63,40 @@ void traverse_dir (char* begin)
 
       asprintf(&fullpath, "%s/%s", begin, contents->d_name);
       
-      if (contents->d_type == DT_DIR) {
+      stat (fullpath, &dino);
+      if (S_ISDIR(dino.st_ino)) {
+#ifdef DEBUG
+        fprintf(stderr, "DEBUG: Recursing into %s", fullpath);
+#endif
         traverse_dir(fullpath);
       }
 
       else {
         /* Skip filenames with no extension */
         if ((comp = strrchr(contents->d_name, '.')) == NULL)
+	{
+#ifdef DEBUG
+	  fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
+#endif
           continue;
-	
-        if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
-          TagLib::VorbisFile current_ogg (TagLib::String(fullpath));
-	  tag = current_ogg.tag();
-#ifdef DEBUG
-          printf("OGG: %s - %s\n", tag->artist(), tag->title());
-#endif
-        }
-        else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
-          TagLib::MPEGFile current_mp3 (TagLib::String(fullpath));
-	  tag = current_mp3.tag();
-#ifdef DEBUG
-	  printf("MP3: %s - %s\n", tag->artist(), tag->title());
-#endif
 	}
+        if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
+          TagLib::FileRef ref (new TagLib::VorbisFile(fullpath));
+  	  tag = ref.tag();
+#ifdef DEBUG
+          printf("OGG: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
+#endif
+					            }
+        else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
+          TagLib::FileRef ref (new TagLib::VorbisFile(fullpath));
+  	  tag = ref.tag();
+#ifdef DEBUG
+ 	  printf("MP3: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
+#endif
+  	}
 #ifdef DEBUG
         else {
-          fprintf(stderr, "DEBUG: Skipping file %s\n", contents->d_name);
+          fprintf(stderr, "DEBUG: skipping unrecognized file %s\n", contents->d_name, contents->d_type);
         }
 #endif
       }
