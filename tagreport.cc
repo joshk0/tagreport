@@ -154,6 +154,8 @@ int main (int argc, char* argv [])
     if (template_head_body.is_set())
       out << replace_header (template_head_body.get(), all_songs->size(), target) << endl;
    
+    out << "</head>" << endl;
+
     if (template_body_tag.is_set())
       out << replace_header (template_body_tag.get(), all_songs->size(), target);
     else
