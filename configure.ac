@@ -59,8 +59,8 @@ AC_SUBST(TAGLIB_ROOT)
 save_CXXFLAGS="$CXXFLAGS"
 save_CPPFLAGS="$CPPFLAGS"
 
-CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
-CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
+CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -L/usr/local/lib"
+CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -L/usr/local/lib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
 
