@@ -48,8 +48,8 @@ y.tab.c: format.y
 
 y.tab.h: y.tab.c
 
-lex.yy.c: templates.h y.tab.h
-y.tab.c: templates.h
+lex.yy.c: tagreport.h templates.h y.tab.h
+y.tab.c: tagreport.h templates.h
 
 .depend: $(SRCS_CXX)
 	$(CXX) $(INCLUDES) -MM $(SRCS_CXX) > .depend
