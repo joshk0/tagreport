@@ -134,6 +134,11 @@ int main (int argc, char* argv [])
         break;
         
       case '?': /* Erroneous option was passed! */
+#ifdef HAVE_GETOPT_LONG
+        cout << "Try `tagreport --help' for more information." << endl;
+#else
+        cout << "Try `tagreport -h' for more information." << endl;
+#endif
         return 1;
     }
   }
