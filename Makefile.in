@@ -72,7 +72,7 @@ install: tagreport tagreport.1
 	$(INSTALL) -d $(datadir)/def
 	
 	@for file in $(wildcard def/*.def); do \
-	  echo $(INSTALL) -m 644 $$file $(datadir)/def; \
+	  echo "$(INSTALL) -m 644 $$file $(datadir)/def"; \
 	  $(INSTALL) -m 644 $$file $(datadir)/def; \
 	done
 
@@ -80,7 +80,7 @@ uninstall:
 	rm -f $(bindir)/tagreport
 	rm -f $(mandir)/man1/tagreport.1
 	@for file in $(wildcard def/*.def); do \
-	  echo rm -f $(datadir)/$$file; \
+	  echo "rm -f $(datadir)/$$file"; \
 	  rm -f $(datadir)/$$file; \
 	done
 	-rmdir $(datadir)/def && rmdir $(datadir)
