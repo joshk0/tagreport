@@ -45,20 +45,20 @@ string replace_header (const string & in, int count, const string & directory)
       {
         case COUNT:
           s << count;
-	  break;
+         break;
 
-	case DATE:
-	  t = get_time_string();
-	  s << t;
-	  free(t);
+       case DATE:
+         t = get_time_string();
+         s << t;
+         free(t);
           break;
 
-	case DIRECTORY:
-	  s << directory;
-	  break;
+       case DIRECTORY:
+         s << directory;
+         break;
 
-	default: /* wtf dude */
-	  abort();
+       default: /* wtf dude */
+         abort();
       }
       
       out.replace (j, header_map[i].term_length, s.str());
@@ -82,7 +82,7 @@ string replace_body (const string & artist, const string & title)
     {
       if (body_map[i].i == ARTIST)
         out.replace (j, body_map[i].term_length, artist);
-	      
+             
       else if (body_map[i].i == TITLE)
         out.replace (j, body_map[i].term_length, title);
 
