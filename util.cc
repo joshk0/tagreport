@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #ifdef HAVE_LIBIBERTY_H
 #include <libiberty.h>
@@ -114,4 +115,20 @@ char* guess_fn (char* a)
     else
       exit(1);
   }
+}
+
+char* comma_delineate (const vector<char*> & in)
+{
+  vector<char*>::const_iterator i;
+  ostringstream a;
+
+  for (i = in.begin(); i != in.end(); i++)
+  {
+    if (i + 1 != in.end())
+      a << *i << ", ";
+    else
+      a << *i;
+  }
+
+  return strdup(a.str().c_str());
 }

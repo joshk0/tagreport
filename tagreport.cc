@@ -56,6 +56,8 @@ extern FILE *yyin;
 
 static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
+static void clean (vector<char*> & dirs);
+static void verify (vector<char*> & targets);
 
 #ifdef NDEBUG
 bool verbose = false;
@@ -70,8 +72,9 @@ char* template_fn = NULL;
 int main (int argc, char* argv [])
 {
   bool already_template = false;
-  struct stat id;
   vector <struct Song*>* all_songs = NULL;
+  vector <char*> targets;
+  vector<char*>::iterator t;
   ostringstream tmpout;
   char *target = NULL, *outfile = NULL;
   int opt;
@@ -162,20 +165,20 @@ int main (int argc, char* argv [])
   }
   
   if (optind < argc)
-    target = strdup(argv[optind]);
-  else /* Scan the current directory tree by default. */
+  {
+    while (optind < argc)
+      targets.push_back(strdup(argv[optind++]));
+  }
+  /* Scan the current directory tree by default. */
+  else
   {
     target = (char*)malloc(PATH_MAX + 1);;
     getcwd(target, PATH_MAX);
+    targets.push_back(target);
   }
 
-  stat (target, &id);
-  
-  if (!S_ISDIR(id.st_mode))
-  {
-    cerr << "Error opening " << target << ": not a directory!" << endl;
-    return 1;
-  }
+  verify (targets);
+  target = comma_delineate(targets);
   
   /* Default output location - $PWD/playlist.htm */
   if (!outfile)
@@ -195,7 +198,21 @@ int main (int argc, char* argv [])
   if (verbose)
     cout << "Scanning ";
   
-  all_songs = traverse_dir(target);
+  for (t = targets.begin(); t != targets.end(); t++)
+  {
+    vector<struct Song*>* this_dir = NULL;
+    this_dir = traverse_dir(*t);
+
+    /* Append this directory */
+
+    if (all_songs != NULL)
+    {
+      all_songs->insert (all_songs->end(), this_dir->begin(), this_dir->end());
+      delete this_dir;
+    }
+    else
+      all_songs = this_dir;
+  }
 
   if (verbose)
     cout << endl;
@@ -256,6 +273,8 @@ int main (int argc, char* argv [])
   /* Miscellaneous memory management */
   if (all_songs)
     clean(all_songs);
+
+  clean(targets);
 
   free(target);
   free(outfile);
@@ -445,3 +464,29 @@ void clean (vector<struct Song *> * root)
 
   delete root;
 }
+
+void clean (vector<char*> & dirs)
+{
+  vector<char*>::iterator t;
+
+  for (t = dirs.begin(); t != dirs.end(); t++)
+    free (*t);
+}
+
+static void verify (vector<char*> & targets)
+{
+  vector<char*>::iterator t;
+  struct stat id;
+
+  for (t = targets.begin(); t != targets.end(); t++)
+  {
+    stat (*t, &id);
+
+    if (!S_ISDIR(id.st_mode))
+    {
+      cerr << "Error opening " << *t << ": not a directory!" << endl;
+      targets.erase(t);
+    }
+  }
+}
+

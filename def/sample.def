@@ -6,7 +6,7 @@
 
 /* For this part of the file there are certain special strings
  * that are automatically replaced.
- * $directory - directory you told TagReport to scan
+ * $directory - directory (or directories) you told TagReport to scan
  * $date - date in HH:MM YY/MM/DD form
  * $count - total count of songs
  */

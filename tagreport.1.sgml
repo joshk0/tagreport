@@ -32,7 +32,7 @@
       <arg><option>-v --verbose</option></arg>
       <arg><option>-o --output</option> <replaceable>file</replaceable></arg>
       <arg><option>-f --force</option></arg>
-      <arg><replaceable>directory</replaceable></arg>
+      <arg><replaceable>directory ...</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -102,9 +102,9 @@
       </varlistentry>
       
       <varlistentry>
-        <term><option>directory</option></term>
+        <term><option>directory ...</option></term>
 	<listitem>
-	<para>Directory to traverse. If not specified, the current directory
+	<para>Directories to traverse. If not specified, the current directory
 	will be the root of the traversal.</para>
 	</listitem>
       </varlistentry>
