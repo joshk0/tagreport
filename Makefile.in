@@ -1,6 +1,7 @@
 CXX = @CXX@
 LEX = @LEX@
 YACC = @YACC@
+INSTALL = @INSTALL@
 TAGLIB_ROOT = @TAGLIB_ROOT@
 DEFS = -DNDEBUG
 
@@ -11,6 +12,15 @@ SRCS_C = lex.yy.c y.tab.c
 SRCS_CXX = tagreport.cc templates.cc util.cc
 OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 LIBS = -L$(TAGLIB_ROOT)/lib -ltag
+
+NAME = @PACKAGE_NAME@
+VERSION = @PACKAGE_VERSION@
+exclusions = .cvsignore autogen.sh CVS playlist.htm
+
+prefix = $(DESTDIR)@prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+datadir = @datadir@
 
 all: tagreport
 
@@ -41,9 +51,47 @@ clean:
 	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~
 
 distclean: clean
-	rm -f Makefile config.status config.log config.h
+	rm -f Makefile config.status config.log config.h .depend
 	rm -rf autom4te.cache
+
+install: tagreport
+	$(INSTALL) -d $(bindir)
+	$(INSTALL) -m 755 tagreport $(bindir)
+	$(INSTALL) -d $(datadir)/tagreport
 	
+	@for file in $(wildcard def/*.def); do \
+	  echo $(INSTALL) -m 644 $$file $(datadir)/tagreport; \
+	  $(INSTALL) -m 644 $$file $(datadir)/tagreport; \
+	done
+
+uninstall:
+	rm -f $(bindir)/tagreport
+	@for file in $(wildcard def/*.def); do \
+	  echo rm -f $(datadir)/tagreport/$$file; \
+	  rm -f $(datadir)/tagreport/$$file; \
+	done
+
+dist: distclean
+	autoheader
+	autoconf
+	rm -rf autom4te.cache *~
+ifeq (,$(wildcard install-sh))
+	cp -f /usr/share/automake/install-sh .
+endif
+	(cd .. && ln -sf $(CURDIR) $(NAME)-$(VERSION))
+	(cd .. && tar $(addprefix --exclude ,$(exclusions)) -chzf $(NAME)-$(VERSION).tar.gz $(NAME)-$(VERSION))
+	rm -rf ../$(NAME)-$(VERSION)
+	@echo; echo "Created source release $(VERSION):"; echo
+	@md5sum ../$(NAME)-$(VERSION).tar.gz
+	@echo
+	@tar tzvf ../$(NAME)-$(VERSION).tar.gz
+	@echo
+	@if test "`whoami`" = "joshk"; then \
+	  rm -f ../$(NAME)-$(VERSION).tar.gz.sign; \
+	  cd ..; \
+	  gpg -o $(NAME)-$(VERSION).tar.gz.sign --sign -a -b $(NAME)-$(VERSION).tar.gz;\
+	fi
+
 -include .depend
 
-.PHONY: distclean clean all
+.PHONY: distclean clean all install uninstall dist

@@ -70,10 +70,14 @@ int main (int argc, char* argv [])
   template_file = NULL;
   
   /* read all options - for now only -o */
-  while ((opt = getopt(argc, argv, "t:o:v")) != -1)
+  while ((opt = getopt(argc, argv, "ht:o:v")) != -1)
   {
     switch(opt)
     {
+      case 'h':
+        puts(usage);
+	return 0;
+
       case 'o':
         outfile = strdup(optarg);
         break;
