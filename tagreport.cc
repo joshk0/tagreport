@@ -105,7 +105,7 @@ int main (int argc, char* argv [])
         {
           cerr << "Warning: " << outfile << " will no longer be written to in favor of " << optarg << "." << endl;
           free(outfile);
-	}
+        }
 
         outfile = strdup(optarg);
         break;
@@ -116,20 +116,20 @@ int main (int argc, char* argv [])
 
       case 'f':
         force = true;
-	break;
-	
+        break;
+        
       case 't':
-	if (already_template)
-	{ 
+        if (already_template)
+        { 
           assert(template_fn);
           cout << "Warning: " << template_fn << " will no longer be loaded in favor of " << optarg << "." << endl;
-	  free(template_fn);
-	}
-	
+          free(template_fn);
+        }
+        
         if ((template_fn = guess_fn (optarg)) != NULL)
           already_template = true;
 
-	break;
+        break;
         
       case '?': /* Erroneous option was passed! */
         return 1;
@@ -299,7 +299,7 @@ vector<struct Song*>* traverse_dir (char* begin)
         
         recursion = traverse_dir((char*)fp.str().c_str());
         all_songs->insert (all_songs->end(), recursion->begin(), recursion->end());
-	delete recursion; /* Already copied into all_songs */
+        delete recursion; /* Already copied into all_songs */
       }
 
       /* Not a directory, assumed to be a normal file */
@@ -347,7 +347,11 @@ vector<struct Song*>* traverse_dir (char* begin)
 
           assert (!ref.isNull());
 
-          tag = ref.tag();
+          if ((tag = ref.tag()) == NULL)
+          {
+            DEBUG("Null tag; corrupt file encountered?", 0);
+            continue;
+          }
         
           /* Do they both have artist and title fields? */
           if (!tag->artist().isNull() && !tag->title().isNull())
