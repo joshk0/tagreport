@@ -12,7 +12,7 @@ using namespace std;
 key template_title, template_header, template_prebody, template_head_body;
 key template_stats, template_body_tag, template_body, template_footer;
 
-FILE * template_file;
+FILE * template_file = NULL;
 
 struct map_dollars header_map[] = {
   { "$count", COUNT, 6 },
