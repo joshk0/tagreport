@@ -153,7 +153,7 @@ echo "libvorbisfile support ........ $yes_OGG"
 echo "libid3tag support ............ $yes_ID3"
 echo
 
-if test $use_TAGLIB -eq 0 && test $use_OGG -eq 0 ] && test $use_ID3 -eq 0 && test $use_FLAC -eq 0; then
+if test $use_TAGLIB -eq 0 && test $use_OGG -eq 0 && test $use_ID3 -eq 0 && test $use_FLAC -eq 0; then
   AC_MSG_ERROR([You need to install at least one of the following: taglib, libvorbisfile, id3tag, libflac.])
 fi
 
