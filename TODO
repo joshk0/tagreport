@@ -2,4 +2,4 @@ TagReport to-do list
 --------------------
 
 - most important: add song lengths, somehow
-
+- Wait for flac support in TagLib and then integrate it.
