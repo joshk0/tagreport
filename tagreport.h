@@ -10,6 +10,10 @@
 # define DEBUG(x, y)
 #endif
 
+#ifndef ARRAY_SIZE
+# define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#endif
+
 struct Song 
 {
   std::string title;

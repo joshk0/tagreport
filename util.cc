@@ -1,5 +1,7 @@
 /* Utility functions for use with TagReport. */
 
+#include "config.h"
+
 #include <ctime>
 #include <cstring>
 #include <sys/stat.h>
@@ -8,7 +10,10 @@
 #include <string>
 #include <sstream>
 
-#include "config.h"
+#ifdef HAVE_LIBIBERTY_H
+#include <libiberty.h>
+#endif
+
 #include "html.h"
 #include "tagreport.h"
 
@@ -38,7 +43,7 @@ void htmlify (string & in)
    * entry in replacehtml */
   for (c = 0; c < in.length(); c++)
   {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < ARRAY_SIZE(replacechars); i++)
     {
       if (in[c] == replacechars[i])
         in.replace (c, 1, replacehtml[i]);

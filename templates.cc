@@ -1,10 +1,17 @@
 /* Template handling functions for TagReport. */
 
+#include "config.h"
 #include "templates.h"
 #include "util.h"
 
 #include <string>
 #include <sstream>
+
+#ifdef HAVE_LIBIBERTY_H
+#include <libiberty.h>
+#endif
+
+#include "tagreport.h"
 
 using namespace std;
 
@@ -18,13 +25,13 @@ key template_head_body, template_header; /* unset by default */
 
 FILE * template_file = NULL;
 
-struct map_dollars header_map[] = {
+const struct map_dollars header_map[] = {
   { "$count", COUNT, 6 },
   { "$date", DATE, 5 },
   { "$directory", DIRECTORY, 10 },
 };
 
-struct map_dollars body_map[] = {
+const struct map_dollars body_map[] = {
   { "$artist", ARTIST, 7 },
   { "$title", TITLE, 6 },
   { "$num", NUMBER, 4 },
@@ -40,7 +47,7 @@ string replace_header (const string & in, int count, const string & directory)
   while ((i = out.find ("\\n")) != string::npos)
     out.replace (i, 2, "\n"); 
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < ARRAY_SIZE(header_map); i++)
   {
     while ((j = out.find (header_map[i].term)) != string::npos)
     {
@@ -82,7 +89,7 @@ string replace_body (const string & artist, const string & title, unsigned int n
   while ((i = out.find ("\\n")) != string::npos)
     out.replace (i, 2, "\n");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < ARRAY_SIZE(body_map); i++)
   {
     while ((j = out.find(body_map[i].term)) != string::npos)
     {
