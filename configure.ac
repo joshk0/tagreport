@@ -59,12 +59,15 @@ CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
 CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
-AC_PATH_PROG(METAFLAC, metaflac)
 
-if test -n "$METAFLAC"; then
-  AC_DEFINE(HAVE_METAFLAC, 1, [Define if metaflac is available.])
-  AC_DEFINE_UNQUOTED(METAFLAC, ["$METAFLAC"], [Path to metaflac.])
-fi
+AC_CHECK_HEADER([FLAC/metadata.h],
+[
+  AC_CHECK_LIB([FLAC], FLAC__metadata_simple_iterator_new,
+    [
+      AC_DEFINE(USE_FLAC, 1, [FLAC support works. Don't change!])
+      AC_SUBST(FLACLIB, -lFLAC)
+    ])
+])
 
 AC_CHECK_FUNCS(getopt_long)
 AC_CHECK_HEADERS([getopt.h libiberty.h])

@@ -12,8 +12,8 @@ char* comma_delineate (const std::vector<char*> & in);
 void htmlify (string &);
 void verify (std::vector<char*> & targets);
 
-#ifdef HAVE_METAFLAC
-bool metaflac (struct Song* flac, const char* path);
+#ifdef USE_FLAC
+bool getflac (struct Song* flac, const char* path);
 #endif
 
-#endif
+#endif /* !INCLUDED_util_h */

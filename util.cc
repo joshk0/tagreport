@@ -17,6 +17,8 @@
 #include <libiberty.h>
 #endif
 
+#include <FLAC/metadata.h>
+
 #include "html.h"
 #include "tagreport.h"
 
@@ -60,7 +62,7 @@ void htmlify (string & in)
    * "&nbsp;&nbsp;" */
   
   while ((c = in.find("  ")) != string::npos)
-      in.replace(c, 2, "&nbsp;&nbsp;");
+    in.replace(c, 2, "&nbsp;&nbsp;");
 }
 
 char* guess_fn (char* a)
@@ -155,40 +157,62 @@ void verify (vector<char*> & targets)
   }
 }
 
-#ifdef HAVE_METAFLAC
-/* Fork metaflac for a file with path path and get its artist and title
- * comment fields. */
-bool metaflac (struct Song* flac, const char* path)
+#ifdef USE_FLAC
+bool getflac (struct Song* flac, const char* path)
 {
-  FILE* mf;
-  ostringstream cmd;
-  char buf[1024];
-  unsigned int i;
-  string fn = path;
-  
-  /* Ewwwww! Sick! */
-  cmd << METAFLAC << " --show-vc-field=artist --show-vc-field=title \"" << path  << "\"";
-  mf = popen(cmd.str().c_str(), "r");
+  bool found_artist = false, found_title = false;
+  FLAC__Metadata_SimpleIterator *it = FLAC__metadata_simple_iterator_new();
 
-  while (fgets(buf, 1024, mf) != NULL)
+  if (!FLAC__metadata_simple_iterator_init(it, path, true, true))
+    return false;
+
+  do
   {
-    string h;
-
-    h = buf;
-
-    if (h.find("ARTIST=") == 0) /* should be first */
-      flac->artist = h.substr(7, h.length() - 8);
-    else if (h.find("TITLE=") == 0)
-      flac->title = h.substr(6, h.length() - 7);
-    else
+    if (FLAC__metadata_simple_iterator_get_block_type(it) ==
+          FLAC__METADATA_TYPE_VORBIS_COMMENT)
     {
-      DEBUG("read failed, buf is", h);
-      return false;
+      unsigned nc = 0, l = 0;
+      
+      FLAC__StreamMetadata *sm;
+      FLAC__StreamMetadata_VorbisComment_Entry *e;
+      
+      sm = FLAC__metadata_simple_iterator_get_block(it);
+
+      nc = sm->data.vorbis_comment.num_comments;
+      e = sm->data.vorbis_comment.comments;
+      
+      for (; nc > 0; nc--)
+      {
+        unsigned i;
+        string field;
+
+        for (i = 0; i < e->length; i++)
+          field += e->entry[i];
+        
+        if (field.find("ARTIST=") == 0)
+        {
+          flac->artist = field.substr(7, field.length() - 7);
+          found_artist = true;
+        }
+        else if (field.find("TITLE=") == 0)
+        {
+          flac->title = field.substr(6, field.length() - 6);
+          found_title = true;
+        }
+       
+        if (found_artist && found_title)
+        {
+          FLAC__metadata_simple_iterator_delete (it);
+          return true;
+        }
+        
+        e++;
+      }
     }
   }
+  while (FLAC__metadata_simple_iterator_next(it));
 
-  pclose(mf);
-  
-  return true;
+  FLAC__metadata_simple_iterator_delete (it);
+  return false;
 }
-#endif
+#endif /* USE_FLAC */

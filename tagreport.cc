@@ -194,14 +194,6 @@ int main (int argc, char* argv [])
     outfile = strdup("playlist.htm");
   
   tmpout << outfile << '.' << getpid();
-    
-  out.open (tmpout.str().c_str(), ios::out | ios::trunc);
-
-  if (!out.is_open())
-  {
-    cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
-    return 1;
-  }
   
   /* Actually scan the hierarchy. */
   if (verbose)
@@ -231,6 +223,14 @@ int main (int argc, char* argv [])
 
   if (verbose)
     cout << endl;
+   
+  out.open (tmpout.str().c_str(), ios::out | ios::trunc);
+
+  if (!out.is_open())
+  {
+    cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
+    return 1;
+  }
     
   /* Write out canned headers to the target file */
   out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
@@ -379,23 +379,21 @@ vector<struct Song*>* traverse_dir (char* begin)
           for (e = ext.begin(); e != ext.end(); e++)
             *e = tolower(*e);
         }
-#ifdef HAVE_METAFLAC
+#ifdef USE_FLAC
         if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
         {
-          metaflac(tmpsong, fp.str().c_str());
+          getflac(tmpsong, fp.str().c_str());
 
           if (tmpsong->title == "" || tmpsong->artist == "")
             delete tmpsong; /* Just ignore it. */
           else
             all_songs->push_back(tmpsong);
         }
-
         /* Ogg Vorbis or MP3 file? */
         else if (ext == "ogg" || ext == "mp3")
 #else
         if (ext == "ogg" || ext == "mp3")
 #endif
-
         {
           TagLib::Tag *tag;
           TagLib::FileRef ref (fp.str().c_str());

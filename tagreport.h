@@ -22,7 +22,7 @@ struct Song
 
 const char usage[] = \
 "TagReport " PACKAGE_VERSION 
-#ifdef HAVE_METAFLAC
+#ifdef USE_FLAC
 " (+FLAC)"
 #endif
 " by Joshua Kwan <joshk@triplehelix.org>\n\
