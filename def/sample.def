@@ -12,7 +12,7 @@ title = "TagReport Generated Playlist ($directory)"
 
 # This will be in between </title> and </head>. It is usually blank
 # but is useful for integrating scripts or style sheets.
-headtag = ""
+headbody = ""
 
 # This is the body tag. Defaults to this if not specified. All usual
 # substitution rules apply.
