@@ -67,15 +67,16 @@ char* guess_fn (char* a)
   else if (*a != '/' && ((ext = strrchr(a, '.')) == NULL ||
        ((a[strlen(a) - 1] != *ext) && strcmp(ext+1, "def"))))
   {
-    size_t slen = strlen(a) + 9;
-    s = (char*)malloc(slen);
+    size_t slen = strlen(a) + 8;
+    s = (char*)malloc(slen + 1);
 
-    snprintf(s, slen, "def/%s.def", a);
+    snprintf(s, slen + 1, "def/%s.def", a);
 
     if (stat (s, &ex) == 0)
       return s;
     else
     {
+      /* Note: sizeof(DATADIR) also counts the NUL, so no +1 needed */
       size_t tdlen = sizeof(DATADIR) + slen;
       char *td = (char*)malloc(tdlen);
       
