@@ -7,7 +7,7 @@ AC_PROG_CXX
 AC_LANG(C++)
 
 if test "$ac_cv_cxx_compiler_gnu" = yes; then
-  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused"
+  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused -I/usr/local/include"
 fi
 
 LEX_LANG=CXX
@@ -69,7 +69,7 @@ AC_CHECK_HEADER([FLAC/metadata.h],
   ])
 ])
 
-AC_CHECK_FUNCS(getopt_long)
+AC_SEARCH_LIBS(getopt_long, gnugetopt)
 AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
