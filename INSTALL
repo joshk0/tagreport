@@ -5,6 +5,7 @@ TagReport installation
 
 * GNU make ('make' on a Linux system, 'gmake' on others)
 * GNU g++, or any other ISO C++ compiler, probably works..
+* flex and bison (any recent versions should do)
 * Some kind of getopt implementation.
 * TagLib. Please retrieve the source from:
 
