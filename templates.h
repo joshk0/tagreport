@@ -17,7 +17,7 @@ class key
     key (char* init) : isSet(true), isDefault(true), keyVal(init) {};
     inline bool is_set (void) const { return isSet; };
     inline bool is_default (void) const { return isDefault; };
-    inline void set (string in) { keyVal = in; isSet = true; isDefault = false; };
+    inline void set (const string & in) { keyVal = in; isSet = true; isDefault = false; };
     inline string get (void) const { return keyVal; };
 
   private:
