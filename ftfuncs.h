@@ -8,7 +8,7 @@
 #include <string>
 
 #ifdef USE_FLAC
-bool get_flac (struct Song* song, const char* path);
+bool get_flac (struct Song * flac, const char * path);
 #endif
 
 #ifdef USE_OGG
@@ -20,7 +20,7 @@ bool get_mp3 (struct Song * mp3, const char * path);
 #endif
 
 #ifdef USE_TAGLIB
-bool get_taglib(struct Song* song, const char* path);
+bool get_taglib(struct Song * song, const char * path);
 #endif
 
 bool get_artist_title (struct Song * song, std::string fn, char* begin);
