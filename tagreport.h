@@ -9,7 +9,7 @@
 # define DEBUG(x, y)
 #endif
 
-typedef struct Song 
+struct Song 
 {
   std::string title;
   std::string artist;
