@@ -29,7 +29,7 @@ extern char *yytext;
 
 %%
 
-Template: KeyPairs
+Template: KeyPairs;
 
 KeyPairs: KeyPairs KeyPair
 	| KeyPair
@@ -100,7 +100,7 @@ KeyPair: KeyType '=' TYPE_VALUE {
   }
 
   free($3);
-}
+};
 
 KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 	| TYPE_HEAD_BODY { $$ = TYPE_HEAD_BODY; }
