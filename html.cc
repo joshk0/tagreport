@@ -15,6 +15,10 @@
 
 using namespace std;
 
+/* Character escaping for HTML */
+static const char replacechars [] = { '&', '<', '>', '\"' };
+static const char* replacehtml [] = { "&amp;", "&lt;", "&gt;", "&quot;" };
+
 void write_html (const char* file, vector<struct Song*>* songs, char* target_dir)
 {
   ofstream out;

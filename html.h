@@ -14,10 +14,6 @@ const char HTMLdtd [] =
 <!DOCTYPE html\n\
      PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
      \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
-	  
-/* Character escaping for HTML */
-static const char replacechars [] = { '&', '<', '>', '\"' };
-static const char* replacehtml [] = { "&amp;", "&lt;", "&gt;", "&quot;" };
 
 /* Useful functions */
 void htmlify (string &);
