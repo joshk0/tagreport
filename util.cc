@@ -40,30 +40,6 @@ char* get_time_string (void)
   return now_date;
 }
 
-/* Escapes illegal HTML characters into their long counterparts. */
-void htmlify (string & in)
-{
-  unsigned int c, i;
-
-  /* replace each found character in replacechars by respective 
-   * entry in replacehtml */
-  for (c = 0; c < in.length(); c++)
-  {
-    for (i = 0; i < ARRAY_SIZE(replacechars); i++)
-    {
-      if (in[c] == replacechars[i])
-        in.replace (c, 1, replacehtml[i]);
-    }
-  }
-
-  /* replace spaces with two &nbsp;, it's the slightest bit overkill
-   * i.e. htmlify("  ") should become " &nbsp;", but it becomes
-   * "&nbsp;&nbsp;" */
-  
-  while ((c = in.find("  ")) != string::npos)
-    in.replace(c, 2, "&nbsp;&nbsp;");
-}
-
 char* guess_fn (char* a)
 {
   char* ext;
