@@ -10,7 +10,7 @@ CXXFLAGS	= @CXXFLAGS@ $(INCLUDES)
 DEFS		= @DEBUG@ -DDATADIR=\"$(datadir)/\"
 TAGLIB_ROOT	= @TAGLIB_ROOT@
 INCLUDES	= @TAGLIB_INCLUDE@ -I/usr/local/include
-LIBS		= @TAGLIB_LD@ -L/usr/local/lib @TAGLIB@ @FLACLIB@ @OGGLIB@ @ID3TAGLIB@
+LIBS		= @TAGLIB_LD@ -L/usr/local/lib @TAGLIB@ @FLACLIB@ @OGGLIB@ @ID3TAGLIB@ @LIBS@
 
 SRCS_C		= lex.yy.c y.tab.c
 SRCS_CXX	= tagreport.cc templates.cc ftfuncs.cc util.cc
