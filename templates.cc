@@ -63,7 +63,7 @@ string replace_header (const string & in, int count, const string & directory)
         case DATE:
           t = get_time_string();
           s << t;
-          free(t);
+          delete t;
           break;
 
         case DIRECTORY:

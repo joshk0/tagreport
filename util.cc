@@ -28,7 +28,7 @@ char* get_time_string (void)
   struct tm *now;
   time_t now_secs;
   /* Length: "HH:MM, YYYY-MM-DD" == 17 + NUL == 18 */
-  char now_date[18];
+  char *now_date = new char[18];
 
   /* Get the current time */
   if (!time(&now_secs))
@@ -37,7 +37,7 @@ char* get_time_string (void)
   now = localtime(&now_secs);
   strftime (now_date, 18, "%H:%M, %Y-%m-%d", now);
 
-  return strdup(now_date);
+  return now_date;
 }
 
 /* Escapes illegal HTML characters into their long counterparts. */
