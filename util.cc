@@ -17,7 +17,6 @@
 #include <libiberty.h>
 #endif
 
-#include "html.h"
 #include "tagreport.h"
 
 using namespace std;
@@ -42,8 +41,8 @@ char* get_time_string (void)
 
 char* guess_fn (char* a)
 {
-  char* ext;
-  ostringstream s, t;
+  char *ext, *s;
+  ostringstream t;
   struct stat ex;
 
   if (stat(a, &ex) == 0)
@@ -68,19 +67,29 @@ char* guess_fn (char* a)
   else if (*a != '/' && ((ext = strrchr(a, '.')) == NULL ||
        ((a[strlen(a) - 1] != *ext) && strcmp(ext+1, "def"))))
   {
-    s << "def/" << a << ".def";
+    size_t slen = strlen(a) + 9;
+    s = (char*)malloc(slen);
 
-    if (stat (s.str().c_str(), &ex) == 0)
-      return strdup(s.str().c_str());
+    snprintf(s, slen, "def/%s.def", a);
+
+    if (stat (s, &ex) == 0)
+      return s;
     else
     {
-      ostringstream t;
-      t << DATADIR << s.str();
+      size_t tdlen = sizeof(DATADIR) + slen;
+      char *td = (char*)malloc(tdlen);
+      
+      snprintf(td, tdlen, "%s%s", DATADIR, s);
+      
+      free (s);
 	    
-      if (stat(t.str().c_str(), &ex) == 0)
-        return strdup(t.str().c_str());
+      if (stat(td, &ex) == 0)
+        return td;
       else
+      {
+        free (td);
         return strdup(a);
+      }
      } 
   }
 
