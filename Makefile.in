@@ -1,26 +1,26 @@
-CXX = @CXX@
-LEX = @LEX@
-YACC = @YACC@
-INSTALL = @INSTALL@
-TAGLIB_ROOT = @TAGLIB_ROOT@
-DEFS = @DEBUG@ -DDATADIR=\"$(datadir)/\"
+CXX		= @CXX@
+LEX		= @LEX@
+YACC		= @YACC@
+INSTALL		= @INSTALL@
 
-CXXFLAGS = @CXXFLAGS@ $(INCLUDES) $(DEFS)
-INCLUDES = -I$(TAGLIB_ROOT)/include/taglib
+CXXFLAGS	= @CXXFLAGS@ $(INCLUDES) $(DEFS)
+DEFS		= @DEBUG@ -DDATADIR=\"$(datadir)/\"
+TAGLIB_ROOT	= @TAGLIB_ROOT@
+INCLUDES	= -I$(TAGLIB_ROOT)/include/taglib
+LIBS		= -L$(TAGLIB_ROOT)/lib -ltag
 
-SRCS_C = lex.yy.c y.tab.c
-SRCS_CXX = tagreport.cc templates.cc util.cc
-OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
-LIBS = -L$(TAGLIB_ROOT)/lib -ltag
+SRCS_C		= lex.yy.c y.tab.c
+SRCS_CXX	= tagreport.cc templates.cc util.cc
+OBJS		= $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 
-NAME = @PACKAGE_NAME@
-VERSION = @PACKAGE_VERSION@
-exclusions = .cvsignore autogen.sh CVS playlist.htm
+NAME		= @PACKAGE_NAME@
+VERSION		= @PACKAGE_VERSION@
+exclusions	= .cvsignore autogen.sh CVS playlist.htm
 
-prefix = $(DESTDIR)@prefix@
-exec_prefix = @exec_prefix@
-bindir = @bindir@
-datadir = @datadir@
+prefix		= $(DESTDIR)@prefix@
+exec_prefix	= @exec_prefix@
+bindir		= @bindir@
+datadir		= @datadir@
 
 all: tagreport
 
