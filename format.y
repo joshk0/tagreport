@@ -11,6 +11,7 @@
 if (!(e).is_default() && (e).is_set()) \
   cerr << "Warning: additional definition of '" << f \
        << "' shadows previous" << endl; \
+DEBUG("Reading template value in for", f); \
 (e).set (g)
 
 using namespace std;
