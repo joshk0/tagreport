@@ -2,8 +2,6 @@
 # define _GNU_SOURCE // asprintf, basename...
 #endif
 
-#define _USE_BSD
-
 #define DEBUG
 
 #include <taglib/vorbisfile.h>
@@ -33,15 +31,20 @@ int main (int argc, char* argv [])
   struct stat id;
   invoked_as = argv[0];
   
-  if (argc < 2) {
+  if (argc < 2)
+  {
     printf ("%s: not enough arguments (syntax: %s [directory])\n", argv[0], basename(argv[0]));
     exit(1);
   }
-  else {
+  else
+  {
     stat (argv[1], &id);
     if (id.st_mode & S_IFDIR)
+    {
       traverse_dir(argv[1]);
-    else {
+    }
+    else
+    {
       fprintf (stderr, "%s: %s: not a directory!\n", argv[0], argv[1]);
       return 1;
     }
@@ -63,7 +66,8 @@ void traverse_dir (char* begin)
   char *comp, *fullpath = NULL;
   TagLib::Tag *tag;
   
-  if ((root = opendir(begin)) != NULL) {
+  if ((root = opendir(begin)) != NULL)
+  {
     while ((contents = readdir(root)) != NULL)
     {
       asprintf(&fullpath, "%s/%s", begin, contents->d_name);
@@ -77,7 +81,9 @@ void traverse_dir (char* begin)
 
       /* Recurse if this entry is actually a directory */
       stat (fullpath, &dino);
-      if (dino.st_mode & S_IFDIR) {
+      
+      if (dino.st_mode & S_IFDIR)
+      {
 #ifdef DEBUG
         fprintf(stderr, "DEBUG: Recursing into %s\n", fullpath);
 #endif
@@ -85,7 +91,8 @@ void traverse_dir (char* begin)
       }
 
       /* Otherwise, it's a normal file */
-      else {
+      else
+      {
         /* Skip filenames with no extension */
         if ((comp = strrchr(contents->d_name, '.')) == NULL)
         {
@@ -98,21 +105,34 @@ void traverse_dir (char* begin)
         
         /* Ogg Vorbis or MP3 file? */
         if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
-            || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
+            || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3"))
+	{
           TagLib::FileRef ref (fullpath);
 
           if(ref.isNull())
             abort();
 
-            tag = ref.tag();
-#ifdef DEBUG
-          printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());
-#endif
-        }
+          tag = ref.tag();
+        
+	  if (!tag->artist().isNull() && !tag->title().isNull())
+	  {
+	    printf("%s - %s\n", 
+			  tag->artist().isNull() ? "<none>"
+			  : tag->artist().toCString(),
+			  tag->title().isNull() ? "<none>"
+			  : tag->title().toCString());
+	  }
+	  else
+	  {
+            /* strip the extension from a filename without ID */
+            puts(strrchr(contents->d_name, '.') - 1);
+	  }
+	}
         
 #ifdef DEBUG
         /* Note that we did not do anything with this file */
-        else {
+        else
+	{
           fprintf(stderr, "DEBUG: skipping unrecognized file %s\n", contents->d_name, contents->d_type);
         }
 #endif
