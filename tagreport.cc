@@ -2,6 +2,8 @@
 # define _GNU_SOURCE // asprintf, basename...
 #endif
 
+#define DEBUG
+
 #include <taglib/vorbisfile.h>
 #include <taglib/mpegfile.h>
 #include <taglib/tag.h>
@@ -45,6 +47,7 @@ void traverse_dir (char* begin)
 {
   /* XXX NOT DONE XXX */
   DIR* root;
+  TagLib::Tag * tag;
   struct dirent * contents;
   char *comp, *fullpath = NULL;
   
@@ -66,9 +69,17 @@ void traverse_dir (char* begin)
 	
         if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
           TagLib::VorbisFile current_ogg (TagLib::String(fullpath));
+	  tag = current_ogg.tag();
+#ifdef DEBUG
+          printf("OGG: %s - %s\n", tag->artist(), tag->title());
+#endif
         }
         else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
           TagLib::MPEGFile current_mp3 (TagLib::String(fullpath));
+	  tag = current_mp3.tag();
+#ifdef DEBUG
+	  printf("MP3: %s - %s\n", tag->artist(), tag->title());
+#endif
 	}
 #ifdef DEBUG
         else {
