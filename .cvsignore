@@ -11,6 +11,5 @@ config.h.in
 config.log
 config.status
 configure
-install-sh
 autom4te.cache
 tagreport.1
