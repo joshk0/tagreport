@@ -2,6 +2,7 @@
 
 #include "config.h"
 
+#include <cerrno>
 #include <ctime>
 #include <cstring>
 #include <sys/stat.h>
