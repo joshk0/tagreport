@@ -6,13 +6,9 @@ AC_PROG_CXX
 
 AC_LANG(C++)
 
-INCLUDES="-I/usr/local/include"
-
 if test "$ac_cv_cxx_compiler_gnu" = yes; then
   CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused $INCLUDES"
 fi
-
-CPPFLAGS="$CPPFLAGS $INCLUDES"
 
 LEX_LANG=CXX
 YACC_LANG=CXX
@@ -59,8 +55,8 @@ AC_SUBST(TAGLIB_ROOT)
 save_CXXFLAGS="$CXXFLAGS"
 save_CPPFLAGS="$CPPFLAGS"
 
-CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -L/usr/local/lib"
-CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -L/usr/local/lib"
+CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
+CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
 
