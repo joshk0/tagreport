@@ -18,12 +18,21 @@ struct Song
 
 const char usage[] = \
 "TagReport " PACKAGE_VERSION " by Joshua Kwan <joshk@triplehelix.org>\n\
-Syntax: tagreport [-h] [-v] [-t template] [-o output] directory\n\
-Options:\n\
+Syntax: tagreport [-h] [-v] [-t template] [-o output] directory\n"
+#ifdef HAVE_GETOPT_LONG
+"Options:\n\
+  -h --help\t\t\tDisplay this help message.\n\
+  -t --template [template]\tChoose a template file to use when creating\n\
+  \t\t\t\tthe HTML report.\n\
+  -o --output [file]\t\tStore the result here (default ./playlist.htm)\n\
+  -v --verbose\t\t\tBe verbose. (By default on if debug is enabled)";
+#else
+"Options:\n\
   -h\t\tDisplay this help message.\n\
   -t template\tChoose a template file to use when creating the HTML report.\n\
   -o output\tStore the result here (default ./playlist.htm)\n\
   -v\t\tBe verbose. (By default on if debug is enabled)";
+#endif
 
 extern bool verbose;
 

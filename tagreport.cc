@@ -45,6 +45,10 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#ifdef HAVE_GETOPT_H
+#include <getopt.h>
+#endif
+
 using namespace std;
 
 extern int yyparse (void);
@@ -65,11 +69,23 @@ int main (int argc, char* argv [])
   ostringstream tmpout;
   char *target = NULL, *outfile = NULL;
   int opt;
+#ifdef HAVE_GETOPT_LONG
+  struct option longopts [] = {
+    { "help"    , 0, 0, 'h' },
+    { "template", 0, 0, 't' },
+    { "output"  , 0, 0, 'o' },
+    { "verbose" , 0, 0, 'v' }
+  };
+#endif
   
   template_file = NULL;
   
   /* read all options - for now only -o */
+#ifdef HAVE_GETOPT_LONG
   while ((opt = getopt(argc, argv, "ht:o:v")) != -1)
+#else
+  while ((opt = getopt_long(argc, argv, "ht:o:v", longopts, NULL)) != -1)
+#endif
   {
     switch(opt)
     {

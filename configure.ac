@@ -44,6 +44,9 @@ save_CPPFLAGS="$CPPFLAGS"
 CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
 CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
+AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_HEADERS(getopt.h)
+
 AC_CHECK_HEADERS([fileref.h tag.h], , [AC_MSG_ERROR([Missing some TagLib headers, is your install complete?])])
 
 CXXFLAGS="$save_CXXFLAGS"
