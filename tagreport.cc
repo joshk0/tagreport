@@ -63,10 +63,18 @@ void traverse_dir (char* begin)
 
       asprintf(&fullpath, "%s/%s", begin, contents->d_name);
       
-      stat (fullpath, &dino);
-      if (S_ISDIR(dino.st_ino)) {
+      if (!strcmp(contents->d_name, ".") || !strcmp(contents->d_name, ".."))
+      {
 #ifdef DEBUG
-        fprintf(stderr, "DEBUG: Recursing into %s", fullpath);
+        fprintf(stderr, "DEBUG: Not recursing into dot-dir '%s'\n", contents->d_name);
+#endif
+        continue;
+      }
+
+      stat (fullpath, &dino);
+      if (dino.st_mode & S_IFDIR) {
+#ifdef DEBUG
+        fprintf(stderr, "DEBUG: Recursing into %s\n", fullpath);
 #endif
         traverse_dir(fullpath);
       }
@@ -86,8 +94,9 @@ void traverse_dir (char* begin)
 #ifdef DEBUG
           printf("OGG: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
 #endif
-					            }
-        else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
+	}
+     
+	else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
           TagLib::FileRef ref (new TagLib::VorbisFile(fullpath));
   	  tag = ref.tag();
 #ifdef DEBUG
