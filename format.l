@@ -13,6 +13,7 @@ using namespace std;
 #include "config.h"
 #include "y.tab.h"
 #include "templates.h"
+#include "tagreport.h"
 
 /* Instruct lex to look in template_file for input. */
 #define YY_INPUT(buf, result, max_size) \
@@ -57,5 +58,15 @@ COMMENT		^#.*
 "body"		{ return TYPE_BODY; }
 "bodytag"	{ return TYPE_BODY_TAG; }
 
-.		{ cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template, bailing out!" << endl; exit(1); }
+. {
+  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template";
+  if (!force)
+  {
+    cerr << ", bailing out!" << endl;
+    exit(1);
+  }
+  else
+    cerr << ", continuing." << endl;
+}
+
 %%

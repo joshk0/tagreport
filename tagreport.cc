@@ -62,12 +62,15 @@ bool verbose = false;
 bool verbose = true;
 #endif
 
+bool force = false;
+
 int main (int argc, char* argv [])
 {
+  bool already_template = false;
   struct stat id;
   vector <struct Song*>* all_songs = NULL;
   ostringstream tmpout;
-  char *target = NULL, *outfile = NULL;
+  char *target = NULL, *outfile = NULL, *template_fn = NULL;
   int opt;
   unsigned int i;
   ofstream out;
@@ -75,18 +78,19 @@ int main (int argc, char* argv [])
 #ifdef HAVE_GETOPT_LONG
   struct option longopts [] = {
     { "help"    , 0, 0, 'h' },
-    { "template", 0, 0, 't' },
-    { "output"  , 0, 0, 'o' },
+    { "template", 1, 0, 't' },
+    { "output"  , 1, 0, 'o' },
     { "verbose" , 0, 0, 'v' },
+    { "force"   , 0, 0, 'f' },
     { 0, 0, 0, 0 }
   };
 #endif
   
   /* read all options */
 #ifdef HAVE_GETOPT_LONG
-  while ((opt = getopt_long(argc, argv, "ht:o:v", longopts, NULL)) != -1)
+  while ((opt = getopt_long(argc, argv, "ht:o:vf", longopts, NULL)) != -1)
 #else
-  while ((opt = getopt(argc, argv, "ht:o:v")) != -1)
+  while ((opt = getopt(argc, argv, "ht:o:vf")) != -1)
 #endif
   {
     switch(opt)
@@ -103,55 +107,45 @@ int main (int argc, char* argv [])
         verbose = true;
         break;
 
+      case 'f':
+        force = true;
+	break;
+	
       case 't':
-      {
-        char* ext;
-
-	/* If it has no extension, a blank extension, or it has an extension
-	 * that is not 'def'. */
-	if (*optarg != '/' && ((ext = strrchr(optarg, '.')) == NULL ||
-              ((optarg[strlen(optarg) - 1] != *ext) && strcmp(ext+1, "def"))))
-	{
-          ostringstream s;
-	  struct stat ex;
-	  s << "def/" << optarg << ".def";
-
-	  if (stat (s.str().c_str(), &ex) == 0)
-            optarg = strdup(s.str().c_str());
-          else
-	  {
-	    ostringstream t;
-	    t << DATADIR << s.str();
-	    
-            if (stat(t.str().c_str(), &ex) == 0)
-              optarg = strdup(t.str().c_str());
-	    else
-              optarg = strdup(optarg);
-	  } 
+	if (already_template)
+	{ 
+          assert(template_fn);
+          cout << "Warning: " << template_fn << " will no longer be loaded in favor of " << optarg << "." << endl;
+	  free(template_fn);
 	}
-	else
-          optarg = strdup(optarg);
-		
-        if ((template_file = fopen (optarg, "r")) == NULL)
-        {
-          cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
-          free(optarg);
-          return 1;
-        }
-        else
-        {
-          yyparse();
-          fclose (template_file);
-          free(optarg);
-        }
-        break;
-      }
+	
+        if ((template_fn = guess_fn (optarg)) != NULL)
+          already_template = true;
+
+	break;
         
       case '?': /* Erroneous option was passed! */
         return 1;
     }
   }
-    
+
+  /* Load the template into memory. */
+  if (template_fn)
+  {
+    if ((template_file = fopen (template_fn, "r")) == NULL)
+    {
+      cerr << "Error reading template " << template_fn << ": " << strerror(errno) << endl;
+      free(template_fn);
+      return 1;
+    }
+    else
+    {
+      yyparse();
+      fclose(template_file);
+      free(template_fn);
+    }
+  }
+  
   if (optind < argc)
     target = strdup(argv[optind]);
   else /* Scan the current directory tree by default. */

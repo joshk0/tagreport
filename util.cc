@@ -2,9 +2,15 @@
 
 #include <ctime>
 #include <cstring>
-#include <string>
+#include <sys/stat.h>
 
+#include <iostream>
+#include <string>
+#include <sstream>
+
+#include "config.h"
 #include "html.h"
+#include "tagreport.h"
 
 using namespace std;
 
@@ -45,4 +51,61 @@ void htmlify (string & in)
   
   while ((s = in.find("  ")) != string::npos)
       in.replace(s, 2, "&nbsp;&nbsp;");
+}
+
+char* guess_fn (char* a)
+{
+  char* ext;
+  ostringstream s, t;
+  struct stat ex;
+
+  if (stat(a, &ex) == 0)
+    return strdup(a);
+
+  /* Conditions:
+   *
+   * 1. Path is not absolute
+   *
+   * and
+   *
+   * 2. The filename has no extension
+   *
+   * or
+   *
+   * 3. The filename has an empty extension
+   * 4. The filename's extension is NOT 'def'
+   *
+   * then we should attempt to guess from our hardcoded paths and
+   * the current path with def/.
+   */
+  else if (*a != '/' && ((ext = strrchr(a, '.')) == NULL ||
+       ((a[strlen(a) - 1] != *ext) && strcmp(ext+1, "def"))))
+  {
+    s << "def/" << a << ".def";
+
+    if (stat (s.str().c_str(), &ex) == 0)
+      return strdup(s.str().c_str());
+    else
+    {
+      ostringstream t;
+      t << DATADIR << s.str();
+	    
+      if (stat(t.str().c_str(), &ex) == 0)
+        return strdup(t.str().c_str());
+      else
+        return strdup(a);
+     } 
+  }
+
+  else
+  {
+    cerr << "Error reading template " << a << ": " << strerror(errno) << endl;
+    if (!force)
+    {
+      cerr << "Continuing with default template." << endl;
+      return NULL;
+    }
+    else
+      exit(1);
+  }
 }

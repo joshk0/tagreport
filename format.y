@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "templates.h"
+#include "tagreport.h"
 
 #define WARN_SHADOW_AND_SET(e, f, g) \
 if (!(e).is_default() && (e).is_set()) \
@@ -98,6 +99,13 @@ KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 
 void yyerror(char const* s)
 {
-  cerr << "Couldn't parse \"" << yytext << "\": " << s << endl;
-  exit(1);
+  cerr << "Couldn't parse \"" << yytext << "\": " << s;
+  
+  if (force)
+    cerr << ", continuing." << endl;
+  else
+  {
+    cerr << ", aborting!" << endl;
+    exit(1);
+  }
 }
