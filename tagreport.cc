@@ -30,7 +30,6 @@
 
 /* C++ forwarding headers */
 #include <cassert>
-#include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
