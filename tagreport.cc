@@ -72,14 +72,36 @@ int main (int argc, char* argv [])
 {
   struct stat id;
   vector <struct Song*>* all_songs = NULL;
-  char* outfile = NULL, *target = NULL;
+  ostringstream tmpout;
+  char *target = NULL, *outfile = NULL;
+  int opt;
+  
   invoked_as = argv[0];
 
-  stat (argv[1], &id);
-  if (id.st_mode & S_IFDIR)
+  /* read all options - for now only -o */
+  while ((opt = getopt(argc, argv, "o:")) != -1)
+  {
+    switch(opt)
+    {
+      case 'o':
+        outfile = strdup(optarg);
+        break;
+	
+      case '?':
+        return 1;
+    }
+  }
+    
+  if (optind < argc)
+    target = strdup(argv[optind]);
+  else
+    target = strdup(getenv("PWD"));
+    
+  stat (target, &id);
+  
+  if (S_ISDIR(id.st_mode))
   {
     unsigned int i;
-    int opt;
     ofstream out;
     struct tm *now;
     time_t now_secs;
@@ -90,30 +112,16 @@ int main (int argc, char* argv [])
     now = localtime(&now_secs);
     strftime (now_date, 18, "%H:%M, %F", now);
     
-    while ((opt = getopt(argc, argv, "o:")) != -1)
-    {
-      switch(opt)
-      {
-        case 'o':
-          outfile = strdup(optarg);
-	  break;
-	
-	case '?':
-	  return 1;
-      }
-    }
+    if (!outfile)
+      outfile = strdup("playlist.htm");
     
-    if (optind < argc)
-      target = strdup(argv[optind]);
-    else
-      target = strdup(getenv("PWD"));
+    tmpout << outfile << '.' << getpid();
     
-    if (!outfile) outfile = strdup("playlist.htm");
-    out.open (outfile, ios::out | ios::trunc);
+    out.open (tmpout.str().c_str(), ios::out | ios::trunc);
 
     if (!out.is_open())
     {
-      cerr << "Failed to open file " << target << ": " << strerror(errno) << endl;
+      cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
       return 1;
     }
     
@@ -142,9 +150,24 @@ int main (int argc, char* argv [])
         out << i << ". " << (*all_songs)[i]->title << "<br />" << endl;
     }
 
+    if (all_songs->size() == 0)
+    {
+      out << "<i>Without music, life would be an error. The German imagines even God singing songs.</i><br />" << endl;
+      out << "-- Friedrich Nietzsche<br />" << endl;
+    }
+
     out << HTMLfooter;
 
     out.close();
+
+    if (rename (tmpout.str().c_str(), outfile) == -1)
+    {
+      cout << "error moving " << tmpout.str() << " to " << outfile << ": " << strerror(errno) << endl;
+      cout << "Note: " << tmpout.str() << " was written to and still exists." << endl;
+     
+      /* We can't create outfile. */
+      outfile = (char*)tmpout.str().c_str();
+    }
     
     if (all_songs->size() != 0)
       cout << "Wrote " << outfile << " (" << all_songs->size() << " songs) successfully." << endl;
