@@ -10,7 +10,6 @@
 #include <taglib/mpegfile.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
-#include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
 
 #include <errno.h>
@@ -89,23 +88,15 @@ void traverse_dir (char* begin)
           continue;
 	}
 	
-	/* Ogg Vorbis file? */
-        if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")) {
+	/* Ogg Vorbis or MP3 file? */
+        if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
+	    || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
           TagLib::FileRef ref (fullpath);
   	  tag = ref.tag();
 #ifdef DEBUG
-          printf("OGG: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
+          printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());
 #endif
 	}
-     
-	/* MP3 file? */
-	else if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
-          TagLib::FileRef ref (fullpath);
-  	  tag = ref.tag();
-#ifdef DEBUG
- 	  printf("file: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
-#endif
-  	}
 	
 #ifdef DEBUG
 	/* Note that we did not do anything with this file */
