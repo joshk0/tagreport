@@ -21,9 +21,7 @@ using namespace std;
   char * buff; \
 \
   if ((buff = fgets (buf, max_size, template_file)) == NULL) \
-  { \
     result = 0; \
-  } \
   else \
     result = strlen(buf); \
 }
@@ -31,7 +29,7 @@ using namespace std;
 %}
 
 VALUE		\".*\"
-MALSTRING	\"[^\"]*\n
+MALSTRING	\"[^\"\n]*\n
 WHITE		[\n\t ]*
 COMMENT		^#.*
 
@@ -44,7 +42,14 @@ COMMENT		^#.*
   return TYPE_VALUE;
 }
 
-{MALSTRING}	{ cerr << "error: unterminated string constant in template: " << yytext; exit(1); }
+{MALSTRING} {
+  /* yytext already contains a newline, no need for one here */
+  cerr << "Error: unterminated string constant in template: " << yytext;
+
+  if (!force)
+    exit(1);
+}
+
 {WHITE}		{ }
 {COMMENT}	{ }
 
