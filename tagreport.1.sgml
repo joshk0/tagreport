@@ -44,7 +44,7 @@
 
     <para>It currently only supports scanning of MP3 and Ogg Vorbis audio
     files. The FLAC format is mostly supported, but not extensively tested,
-    and only available if the metaflac program is on your system at build
+    and only available if the libFLAC library is on your system at build
     time.</para>
 
     <para>TagReport also supports customizable HTML templates using a simple
@@ -116,7 +116,7 @@
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>xmms(1), metaflac(1).</para>
+    <para>xmms(1).</para>
 
   </refsect1>
   <refsect1>
