@@ -33,9 +33,13 @@ all: tagreport tagreport.1
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 tagreport.1: $(wildcard tagreport.1.sgml)
+ifneq (,$(DOCBOOK))
 	$(DOCBOOK) $< > $@~
 	sed -n "`grep -n '^.TH' $@~ | awk -F : '{print $$1}'`~1p" $@~ > $@2~
 	rm -f $@~; mv -f $@2~ $@
+else
+	touch tagreport.1
+endif
 	
 tagreport: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
