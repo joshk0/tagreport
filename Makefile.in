@@ -1,13 +1,16 @@
-CXX = g++
-CXXFLAGS = -g3 -W -Wall -O0 $(INCLUDES) $(DEFS)
+CXX = @CXX@
+LEX = @LEX@
+YACC = @YACC@
+TAGLIB_ROOT = @TAGLIB_ROOT@
 DEFS = -DNDEBUG
+
+CXXFLAGS = @CXXFLAGS@ $(INCLUDES) $(DEFS)
+INCLUDES = -I$(TAGLIB_ROOT)/include/taglib
 
 SRCS_C = lex.yy.c y.tab.c
 SRCS_CXX = tagreport.cc templates.cc util.cc
 OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
-
-INCLUDES = -I/usr/local/include/taglib
-LIBS = -ltag
+LIBS = -L$(TAGLIB_ROOT)/lib -ltag
 
 all: tagreport
 
@@ -21,10 +24,10 @@ tagreport: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
 
 lex.yy.c: format.l
-	flex $<
+	$(LEX) $<
 
 y.tab.c: format.y
-	bison -d -y $<
+	$(YACC) -d $<
 
 y.tab.h: y.tab.c
 
@@ -37,4 +40,10 @@ y.tab.c: templates.h
 clean:
 	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~
 
+distclean: clean
+	rm -f Makefile config.status config.log config.h
+	rm -rf autom4te.cache
+	
 -include .depend
+
+.PHONY: distclean clean all

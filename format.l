@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#include "config.h"
 #include "y.tab.h"
 #include "templates.h"
 

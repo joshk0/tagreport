@@ -5,3 +5,6 @@ playlist.htm
 y.tab.*
 lex.yy.*
 .depend
+config.h
+config.h.in
+configure
