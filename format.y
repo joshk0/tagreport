@@ -100,7 +100,7 @@ KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 
 void yyerror(char const* s)
 {
-  cerr << "Couldn't parse \"" << yytext << "\" at line " << line << " column " << col << endl;
+  cerr << "Couldn't parse \"" << yytext << "\" at line " << line << " column " << col << ": " << s << endl;
 
   if (!force)
     exit(1);
