@@ -1,4 +1,5 @@
 #include <taglib/vorbisfile.h>
+#include <taglib/mpegfile.h>
 #include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
 
@@ -41,8 +42,22 @@ void traverse_dir (char* begin)
   struct dirent * contents;
   
   if ((root = opendir(begin)) != NULL) {
-    while ((contents = readdir(begin)) != NULL) {
-      /* DURRRRRRRRRRRRRRRRRRR */
+    /* DURRRRRRRRRRRRRRRRRRR  not done yet */
+    while ((contents = readdir(root)) != NULL) {
+      if (contents->d_type == DT_DIR) {
+        traverse_dir(contents->d_name);
+      }
+      else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
+        TagLib::VorbisFile current_ogg (TagLib::String(contents->d_name));
+      }
+      else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
+        TagLib::MPEGFile current_mp3 (TagLib::String(contents->d_name));
+      }
+#ifdef DEBUG
+      else {
+        fprintf(stderr, "DEBUG: Skipping file %s\n", contents->d_name);
+      }
+#endif
     }
   }
   else {
