@@ -46,7 +46,11 @@
 #include <unistd.h>
 
 #ifdef HAVE_GETOPT_H
-#include <getopt.h>
+# include <getopt.h>
+#else
+# ifdef HAVE_LIB_GETOPT_H
+#  include "lib/getopt.h"
+# endif
 #endif
 
 using namespace std;
@@ -178,6 +182,13 @@ int main (int argc, char* argv [])
   }
 
   verify (targets);
+
+  if (targets.size() == 0)
+  {
+    cout << "All targets invalidated! :( Exiting." << endl;
+    return 1;
+  }
+
   target = comma_delineate(targets);
   
   /* Default output location - $PWD/playlist.htm */
@@ -480,12 +491,14 @@ static void verify (vector<char*> & targets)
 
   for (t = targets.begin(); t != targets.end(); t++)
   {
-    stat (*t, &id);
+    DEBUG("Now at", *t);
 
-    if (!S_ISDIR(id.st_mode))
+    if (stat(*t, &id) == -1 || !S_ISDIR(id.st_mode))
     {
       cerr << "Error opening " << *t << ": not a directory!" << endl;
       targets.erase(t);
+
+      t--;
     }
   }
 }
