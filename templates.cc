@@ -1,5 +1,4 @@
-/* Template handling functions
- * XXX: for now, just defines variables needed */
+/* Template handling functions for TagReport. */
 
 #include "templates.h"
 #include "util.h"
