@@ -397,7 +397,7 @@ vector<struct Song*>* traverse_dir (char* begin)
 
           if ((tag = ref.tag()) == NULL)
           {
-            DEBUG("Null tag; corrupt file encountered?", 0);
+            DEBUG("Null tag; corrupt file encountered?", "");
             continue;
           }
         
