@@ -25,13 +25,13 @@ const char usage[] = \
 Syntax: tagreport [-h] [-v] [-t template] [-o output] directory\n"
 #ifdef HAVE_GETOPT_LONG
 "Options:\n\
-  -h --help\t\t\tDisplay this help message.\n\
-  -t --template [template]\tChoose a template file to use when creating\n\
+  -h, --help\t\t\tDisplay this help message.\n\
+  -t, --template [template]\tChoose a template file to use when creating\n\
   \t\t\t\tthe HTML report.\n\
-  -f --force\t\t\tForce parsing of template files to continue if\n\
+  -f, --force\t\t\tForce parsing of template files to continue if\n\
   \t\t\t\terrors occur.\n\
-  -o --output [file]\t\tStore the result here (default ./playlist.htm)\n\
-  -v --verbose\t\t\tBe verbose. (By default on if debug is enabled)";
+  -o, --output [file]\t\tStore the result here (default ./playlist.htm)\n\
+  -v, --verbose\t\t\tBe verbose. (By default on if debug is enabled)";
 #else
 "Options:\n\
   -h\t\tDisplay this help message.\n\
