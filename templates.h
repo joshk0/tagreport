@@ -49,5 +49,16 @@ extern FILE * template_file;
 string replace_header (const string & in, int count, const string & directory);
 string replace_body (const string & artist, const string & title, unsigned int n);
 
+/* Some very useful macros. */
+#define OUTPUT_HEADER_IF_SET(stream, vec, dir, tmpl) \
+if ((tmpl).is_set()) \
+  OUTPUT_HEADER(stream,vec,dir,tmpl)
+
+#define OUTPUT_HEADER(stream, vec, dir, tmpl) \
+  (stream) << replace_header((tmpl).get(), (vec)->size(), dir) << endl;
+
+#define OUTPUT_BODY(stream, item, num) \
+  (stream) << replace_body((item)->artist, (item)->title, num) << endl;
+
 #endif
 

@@ -69,6 +69,9 @@ int main (int argc, char* argv [])
   ostringstream tmpout;
   char *target = NULL, *outfile = NULL;
   int opt;
+  unsigned int i;
+  ofstream out;
+        
 #ifdef HAVE_GETOPT_LONG
   struct option longopts [] = {
     { "help"    , 0, 0, 'h' },
@@ -113,14 +116,14 @@ int main (int argc, char* argv [])
        }
        break;
         
-      case '?':
+      case '?': /* Erroneous option was passed! */
         return 1;
     }
   }
     
   if (optind < argc)
     target = strdup(argv[optind]);
-  else
+  else /* Scan the current directory tree by default. */
   {
     target = (char*)malloc(PATH_MAX + 1);;
     getcwd(target, PATH_MAX);
@@ -128,101 +131,88 @@ int main (int argc, char* argv [])
 
   stat (target, &id);
   
-  if (S_ISDIR(id.st_mode))
-  {
-    unsigned int i;
-    ofstream out;
-        
-    /* Default output location - $PWD/playlist.htm */
-    if (!outfile)
-      outfile = strdup("playlist.htm");
-    
-    tmpout << outfile << '.' << getpid();
-    
-    out.open (tmpout.str().c_str(), ios::out | ios::trunc);
-
-    if (!out.is_open())
-    {
-      cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
-      return 1;
-    }
-    
-    if (verbose)
-      cout << "Scanning ";
-    
-    all_songs = traverse_dir(target);
-
-    if (verbose)
-      cout << endl;
-    
-    /* Write out canned headers */
-    out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
-
-    assert (template_title.is_set());
-    
-    out << replace_header (template_title.get(), all_songs->size(), target);
-    out << endl << "</title>" << endl;
-
-    /* For CSS and JavaScript and such... */
-    if (template_head_body.is_set())
-      out << replace_header (template_head_body.get(), all_songs->size(), target) << endl;
-   
-    out << "</head>" << endl;
-
-    assert (template_body_tag.is_set());
-    
-    out << replace_header (template_body_tag.get(), all_songs->size(), target);
-  
-    if (template_header.is_set())
-      out << replace_header (template_header.get(), all_songs->size(), target) << endl;
-
-    /* Some statistics ... */
-    assert (template_stats.is_set());
-    out << replace_header (template_stats.get(), all_songs->size(), target) << endl;
-    
-    /* Use literally. */
-    if (template_prebody.is_set())
-      out << replace_header(template_prebody.get(), all_songs->size(), target) << endl;
-    
-    /* Loop through the vector and HTML-output its contents. */
-    assert (template_body.is_set());
-    
-    for (i = 0; i < all_songs->size(); i++)
-      out << replace_body ((*all_songs)[i]->artist, (*all_songs)[i]->title, i + 1) << endl;
-
-    /* Footer output. Treated as a header for processing purposes. */
-    assert (template_footer.is_set());
-    
-    out << replace_header (template_footer.get(), all_songs->size(), target);
-    out << "</body>\n</html>" << endl;
-
-    /* Flush the file and close it */
-    out.close();
-
-    /* Move temporary file to the real thing */
-    if (rename (tmpout.str().c_str(), outfile) == -1)
-    {
-      cout << "error moving " << tmpout.str() << " to " << outfile << ": " << strerror(errno) << endl;
-      cout << "Note: " << tmpout.str() << " was written to and still exists." << endl;
-     
-      /* We can't create outfile. */
-      outfile = (char*)tmpout.str().c_str();
-    }
-   
-    cout << "Wrote " << outfile;
-    
-    if (all_songs->size() != 0)
-      cout << " (" << all_songs->size() << " songs) successfully." << endl;
-    else
-      cout << ", but found no valid songs!" << endl;
-  }
-  /* !S_ISDIR(dino.st_mode) */
-  else
+  if (!S_ISDIR(id.st_mode))
   {
     cerr << "Error opening " << target << ": not a directory!" << endl;
     return 1;
   }
- 
+  
+  /* Default output location - $PWD/playlist.htm */
+  if (!outfile)
+    outfile = strdup("playlist.htm");
+  
+  tmpout << outfile << '.' << getpid();
+    
+  out.open (tmpout.str().c_str(), ios::out | ios::trunc);
+
+  if (!out.is_open())
+  {
+    cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
+    return 1;
+  }
+  
+  /* Actually scan the hierarchy. */
+  if (verbose)
+    cout << "Scanning ";
+  
+  all_songs = traverse_dir(target);
+
+  if (verbose)
+    cout << endl;
+    
+  /* Write out canned headers to the target file */
+  out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
+
+  assert (template_title.is_set());
+  
+  OUTPUT_HEADER(out, all_songs, target, template_title);
+  out << "</title>" << endl;
+
+  /* For CSS and JavaScript and such... */
+  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_head_body);
+  out << "</head>" << endl;
+
+  assert (template_body_tag.is_set());
+  OUTPUT_HEADER(out, all_songs, target, template_body_tag);
+  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_header);
+    
+  /* Some statistics ... */
+  assert (template_stats.is_set());
+  OUTPUT_HEADER(out, all_songs, target, template_stats);
+    
+  /* Use literally. */
+  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_prebody);
+    
+  /* Loop through the vector and HTML-output its contents. */
+  assert (template_body.is_set());
+  for (i = 0; i < all_songs->size(); i++)
+    OUTPUT_BODY(out, (*all_songs)[i], i + 1);
+
+  /* Footer output. Treated as a header for processing purposes. */
+  assert (template_footer.is_set());
+  OUTPUT_HEADER(out, all_songs, target, template_footer);
+  out << "</body>\n</html>" << endl;
+
+  /* Flush the file and close it */
+  out.close();
+
+  /* Move temporary file to the real thing */
+  if (rename (tmpout.str().c_str(), outfile) == -1)
+  {
+    cout << "error moving " << tmpout.str() << " to " << outfile << ": " << strerror(errno) << endl;
+    cout << "Note: " << tmpout.str() << " was written to and still exists." << endl;
+   
+    /* We can't create outfile. */
+    outfile = (char*)tmpout.str().c_str();
+  }
+   
+  cout << "Wrote " << outfile;
+    
+  if (all_songs->size() != 0)
+    cout << " (" << all_songs->size() << " songs) successfully." << endl;
+  else
+    cout << ", but found no valid songs!" << endl;
+  
   /* Miscellaneous memory management */
   if (all_songs)
     clean(all_songs);
@@ -244,7 +234,6 @@ vector<struct Song*>* traverse_dir (char* begin)
   DIR* root;
   struct dirent * contents;
   struct stat dino;
-  TagLib::Tag *tag;
   vector <struct Song *> *all_songs = new vector<struct Song*>;
   
   if ((root = opendir(begin)) != NULL)
@@ -286,7 +275,7 @@ vector<struct Song*>* traverse_dir (char* begin)
         /* will be used in all cases */
         struct Song * tmpsong = new struct Song;
         string ext = fn;
-                
+
         /* Skip filenames with no extension */
         if (fn.find('.') == string::npos)
         {
@@ -320,6 +309,7 @@ vector<struct Song*>* traverse_dir (char* begin)
         /* Ogg Vorbis or MP3 file? */
         if (ext == "ogg" || ext == "mp3")
         {
+          TagLib::Tag *tag;
           TagLib::FileRef ref (fp.str().c_str());
 
           assert (!ref.isNull());
@@ -332,7 +322,6 @@ vector<struct Song*>* traverse_dir (char* begin)
             /* Non-null but empty tag */
             if (tag->artist().isEmpty() || tag->title().isEmpty()) 
             {
-              tmpsong->artist = "";
               tmpsong->title = fn.substr(0, fn.rfind('.'));
               htmlify(tmpsong->title);
               all_songs->push_back(tmpsong);
@@ -366,7 +355,6 @@ printfn:
 
             if (noext != "")
             {
-              tmpsong->artist = "";
               tmpsong->title = noext;
 
               htmlify(tmpsong->title);
@@ -391,7 +379,8 @@ printfn:
   /* If we get here there was SOME sort of error with opendir() */
   else
   {
-    cout << endl;
+    if (verbose)
+      cout << endl;
     cerr << "Error reading directory " << begin << ": " << strerror(errno) << endl;
     exit(1);
   }
