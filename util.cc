@@ -17,8 +17,6 @@
 #include <libiberty.h>
 #endif
 
-#include <FLAC/metadata.h>
-
 #include "html.h"
 #include "tagreport.h"
 
@@ -29,6 +27,7 @@ char* get_time_string (void)
 {
   struct tm *now;
   time_t now_secs;
+  /* Length: "HH:MM, YYYY-MM-DD" == 17 + NUL == 18 */
   char now_date[18];
 
   /* Get the current time */
