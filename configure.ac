@@ -6,9 +6,13 @@ AC_PROG_CXX
 
 AC_LANG(C++)
 
+INCLUDES="-I/usr/local/include"
+
 if test "$ac_cv_cxx_compiler_gnu" = yes; then
-  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused -I/usr/local/include"
+  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused $INCLUDES"
 fi
+
+CPPFLAGS="$CPPFLAGS $INCLUDES"
 
 LEX_LANG=CXX
 YACC_LANG=CXX
