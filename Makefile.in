@@ -101,6 +101,7 @@ endif
 	rm -rf ../$(NAME)-$(VERSION)
 	(cd .. && ln -sf $(CURDIR) $(NAME)-$(VERSION))
 	(cd .. && tar $(addprefix --exclude ,$(exclusions)) -chzf $(NAME)-$(VERSION).tar.gz $(NAME)-$(VERSION))
+	rm -f ../$(NAME)-$(VERSION)
 	@echo; echo "Created source release $(VERSION):"; echo
 	@md5sum ../$(NAME)-$(VERSION).tar.gz
 	@echo
