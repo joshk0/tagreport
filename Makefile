@@ -1,14 +1,19 @@
 CXX = g++
-CXXFLAGS = -g3 -W -Wall -O0
+CXXFLAGS = -g3 -W -Wall -O0 $(INCLUDES) $(DEFS)
 DEFS = -DNDEBUG
+OBJS = tagreport.o lex.yy.o y.tab.o
+INCLUDES = -I/usr/local/include/taglib
+LIBS = -ltag -ll
 
 all: tagreport
 
 %.o: %.c
-	$(CXX) $(CXXFLAGS) $(DEFS) $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-tagreport: tagreport.cc tagreport.h html.h
-	$(CXX) $(CXXFLAGS) $(DEFS) -I/usr/local/include/taglib $< -o $@ -ltag
+tagreport: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
+
+tagreport.cc: html.h tagreport.h
 
 lex.yy.c: format.l
 	flex -d $<

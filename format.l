@@ -3,9 +3,9 @@
 %{
 
 #include <string>
-#include "y.tab.h"
-
 using namespace std;
+
+#include "y.tab.h"
  
 %}
 
@@ -19,11 +19,11 @@ COMMENT		^#.*
 {VALUE}	{
 	yytext[yyleng - 1] = '\0'; /* Kill the trailing quote */
 	yytext++; /* Kill the leading quote */
-	yyltype.s = new string(yytext);
+	yylval.s = strdup(yytext);
 	return TYPE_VALUE;
 }
 
-{BODY}		{ yyltype.s = new string(yytext); return BODY; }
+{BODY}		{ yylval.s = strdup(yytext); return BODY; }
 {WHITE}		{ }
 {COMMENT}	{ }
 
