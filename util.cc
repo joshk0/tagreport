@@ -167,7 +167,7 @@ bool metaflac (struct Song* flac, const char* path)
   string fn = path;
   
   /* Ewwwww! Sick! */
-  cmd << "metaflac --show-vc-field=artist --show-vc-field=title \"" << path  << "\"";
+  cmd << METAFLAC << " --show-vc-field=artist --show-vc-field=title \"" << path  << "\"";
   mf = popen(cmd.str().c_str(), "r");
 
   while (fgets(buf, 1024, mf) != NULL)

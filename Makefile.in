@@ -6,7 +6,7 @@ INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 DOCBOOK		= @DOCBOOK@
 
-CXXFLAGS	= @CXXFLAGS@ $(INCLUDES) $(DEFS)
+CXXFLAGS	= @CXXFLAGS@ $(INCLUDES)
 DEFS		= @DEBUG@ -DDATADIR=\"$(datadir)/\"
 TAGLIB_ROOT	= @TAGLIB_ROOT@
 INCLUDES	= -I$(TAGLIB_ROOT)/include/taglib
@@ -29,10 +29,10 @@ mandir		= @mandir@
 all: tagreport tagreport.1
 
 %.o: %.c
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEFS) -c $< -o $@
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEFS) -c $< -o $@
 
 tagreport.1: $(wildcard tagreport.1.sgml)
 ifneq (:,$(DOCBOOK))
