@@ -1,6 +1,6 @@
 /*
- * TagReport: a C++ program that will eventually output HTML formatted
- * song lists from a specified directory.
+ * TagReport: a C++ program that outputs HTML formatted song lists from a
+ * specified directory.
  *
  * (C) 2003 Joshua Kwan <joshk@triplehelix.org>
  *
