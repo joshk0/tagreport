@@ -64,13 +64,16 @@ else
   CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
   CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include"
 
-  AC_CHECK_HEADERS([fileref.h tag.h],
+  AC_CHECK_HEADER(tag.h,
   [
-    AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
-    AC_SUBST(TAGLIB, [-ltag])
-    TAGLIB_INCLUDE="-I\$(TAGLIB_ROOT)/include/taglib"
-    TAGLIB_LD="-L\$(TAGLIB_ROOT)/lib"
-    use_TAGLIB=1
+    AC_CHECK_HEADER(fileref.h,
+    [
+      AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
+      AC_SUBST(TAGLIB, [-ltag])
+      TAGLIB_INCLUDE="-I\$(TAGLIB_ROOT)/include/taglib"
+      TAGLIB_LD="-L\$(TAGLIB_ROOT)/lib"
+      use_TAGLIB=1
+    ])
   ])
 
   CXXFLAGS="$save_CXXFLAGS -I/usr/local/include -L/usr/local/lib"
@@ -119,7 +122,7 @@ AC_CHECK_HEADER(id3tag.h,
 ])
 
 AC_CHECK_FUNC(getopt, [AC_DEFINE(HAVE_DECL_GETOPT, 1, [Needed for GNUgetopt headers to work on systems without a native getopt_long.])])
-AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1], [-DHAVE_DECL_GETOPT])
+AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1])
 
 dnl We do this outside the command to allow SEARCH_LIBS to do its $LIBS
 dnl thing
