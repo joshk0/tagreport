@@ -101,7 +101,7 @@ AC_CHECK_HEADER(id3tag.h,
   ])
 ])
 
-AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1])
+AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1], [-DHAVE_DECL_GETOPT])
 
 dnl We do this outside the command to allow SEARCH_LIBS to do its $LIBS
 dnl thing
