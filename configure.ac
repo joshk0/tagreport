@@ -121,12 +121,7 @@ AC_CHECK_HEADER(id3tag.h,
 ])
 
 AC_CHECK_FUNC(getopt, [AC_DEFINE(HAVE_DECL_GETOPT, 1, [Needed for GNUgetopt headers to work on systems without a native getopt_long.])])
-AC_SEARCH_LIBS(getopt_long, gnugetopt,
-[
-  if test "$ac_cv_search_getopt_long" = "-lgnugetopt"; then
-    BLIBS="$BLIBS -lgnugetopt"
-  fi
-], [no_getopt_long=1])
+AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1])
 
 dnl We do this outside the command to allow SEARCH_LIBS to do its $LIBS
 dnl thing
