@@ -36,10 +36,10 @@ COMMENT		^#.*
 %%             /* BEGIN RULES SECTION */
 
 {VALUE}	{
-	yytext[yyleng - 1] = '\0'; /* Kill the trailing quote */
-	yytext++; /* Kill the leading quote */
-	yylval.s = strdup(yytext);
-	return TYPE_VALUE;
+  yytext[yyleng - 1] = '\0'; /* Kill the trailing quote */
+  yytext++; /* Kill the leading quote */
+  yylval.s = strdup(yytext);
+  return TYPE_VALUE;
 }
 
 {WHITE}		{ }

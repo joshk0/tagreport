@@ -75,7 +75,7 @@ int main (int argc, char* argv [])
     {
       case 'h':
         puts(usage);
-	return 0;
+       return 0;
 
       case 'o':
         outfile = strdup(optarg);
@@ -87,16 +87,16 @@ int main (int argc, char* argv [])
 
       case 't':
         if ((template_file = fopen (optarg, "r")) == NULL)
-	{
+       {
           cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
-	  return 1;
-	}
-	else
-	{
+         return 1;
+       }
+       else
+       {
           yyparse();
           fclose (template_file);
-	}
-	break;
+       }
+       break;
         
       case '?':
         return 1;
