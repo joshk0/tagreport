@@ -1,12 +1,15 @@
-# This is a sample TagReport HTML template file.
-# Comments are ONLY prefixed with #. Whitespace is ignored.
-# For all settings, \n will be translated into newlines.
+/* This is a sample TagReport HTML template file.
+ * Single line comments are prefixed with #, otherwise ANSI C style
+ * long comments are recognized. Whitespace is ignored.
+ * For all settings, \n will be translated into newlines.
+ */
 
-# For this part of the file there are certain special strings
-# that are automatically replaced.
-# $directory - directory you told TagReport to scan
-# $date - date in HH:MM YY/MM/DD form
-# $count - total count of songs
+/* For this part of the file there are certain special strings
+ * that are automatically replaced.
+ * $directory - directory you told TagReport to scan
+ * $date - date in HH:MM YY/MM/DD form
+ * $count - total count of songs
+ */
 
 # This will be the title of the page.
 title = "TagReport Generated Playlist ($directory)"
@@ -28,16 +31,17 @@ stats = "<p><font face="arial,sans">$count songs scanned on $date.</font></p>"
 
 prebody = "<p><font face="arial,sans">"
 
-# body is special because it recognizes some different substitutions:
-# $artist - Artist of the current song
-# $title  - Title of the current song
-# $num    - Number of the current song (in order of scanning)
-# $a-t    - A special combined artist + title form. If artist is unset or blank,
-#           it will only print the title. If not, it will be equivalent to
-#           '$artist - $title'.
-#
-# body will be written to the file (with substitutions made) for each song,
-# so in this case it is a complete table row.
+/* body is special because it recognizes some different substitutions:
+ * $artist - Artist of the current song
+ * $title  - Title of the current song
+ * $num    - Number of the current song (in order of scanning)
+ * $a-t    - A special combined artist + title form. If artist is unset/blank,
+ *           it will only print the title. If not, it will be equivalent to
+ *           '$artist - $title'.
+ *
+ * body will be written to the file (with substitutions made) for each song,
+ * so in this case it is a complete table row.
+ */
 
 body = "$a-t<br />"
 

@@ -15,12 +15,20 @@ using namespace std;
 #include "templates.h"
 #include "tagreport.h"
 
+unsigned int line = 1, col = 0;
+unsigned int comment_begin_line;
+
+static void ccomment(void);
+
+#define YY_USER_ACTION col += yyleng;
+
 %}
 
 VALUE		\".*\"
 MALSTRING	\"[^\"\n]*\n
-WHITE		[\n\t ]*
+WHITE		[\t ]*
 COMMENT		^#.*
+LONGCOMMENT	"/*"
 
 %%             /* BEGIN RULES SECTION */
 
@@ -33,7 +41,7 @@ COMMENT		^#.*
 
 {MALSTRING} {
   /* yytext already contains a newline, no need for one here */
-  cerr << "Error: unterminated string constant in template: " << yytext;
+  cerr << "Error: unterminated string constant in template at line " << line << ": " << yytext;
 
   if (!force)
     exit(1);
@@ -41,6 +49,7 @@ COMMENT		^#.*
 
 {WHITE}		{ }
 {COMMENT}	{ }
+{LONGCOMMENT}	{ comment_begin_line = line; ccomment(); }
 
 "="		{ return '='; }
 "title"		{ return TYPE_TITLE; }
@@ -52,8 +61,10 @@ COMMENT		^#.*
 "body"		{ return TYPE_BODY; }
 "bodytag"	{ return TYPE_BODY_TAG; }
 
+\n		{ line++; col = 0; }
+
 . {
-  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template";
+  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template at line " << line;
   if (!force)
   {
     cerr << ", bailing out!" << endl;
@@ -64,3 +75,41 @@ COMMENT		^#.*
 }
 
 %%
+
+/* Ripped from ircd-hybrid/src/ircd_lexer.l */
+void ccomment(void)
+{
+  int c;
+
+  while (1)
+  {
+    while ((c = yyinput()) != '*' && c != EOF)
+    {
+      if (c == '\n')
+      {
+        col = 0;
+	++line;
+      }
+      else
+        ++col;
+    }
+      
+    if (c == '*')
+    {
+      ++col;
+      while ((c = yyinput()) == '*') ++col;
+      if (c == '/') { ++col; break; }
+    }
+    if (c == EOF)
+    {
+      cerr << "Error: encountered end-of-file in comment starting on line " << comment_begin_line << endl;
+
+      if (force)
+        return;
+      else
+        exit(1);
+
+      break;
+    }
+  }
+}
