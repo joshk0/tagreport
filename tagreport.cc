@@ -140,7 +140,11 @@ int main (int argc, char* argv [])
     out << HTMLfooter;
 
     out.close();
-    cout << "Wrote " << outfile << " successfully." << endl;
+    
+    if (all_songs->size() != 0)
+      cout << "Wrote " << outfile << " (" << all_songs->size() << " songs) successfully." << endl;
+    else
+      cout << "Wrote " << outfile << ", but found no valid songs!" << endl;
   }
   else
   {
@@ -310,6 +314,7 @@ printfn:
   /* If we get here there was SOME sort of error with opendir() */
   else
   {
+    cout << endl;
     cerr << invoked_as << ": Error reading directory: " << strerror(errno) << endl;
     exit(1);
   }
@@ -345,5 +350,14 @@ static void htmlify (string & in)
       if (in[c] == replacechars[i])
         in.replace (c, 1, replacehtml[i]);
     }
+  }
+
+  while (true)
+  {
+    unsigned int spacepos;
+    if ((spacepos = in.find("  ")) != string::npos)
+      in.replace(spacepos, 2, "&nbsp;&nbsp;");
+    else
+      break;
   }
 }
