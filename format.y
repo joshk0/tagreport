@@ -26,11 +26,10 @@ extern char *yytext;
 	int kt;
 }
 
-%token   TYPE_TITLE TYPE_HEADER TYPE_STATS TYPE_PREBODY TYPE_FOOTER TYPE_BODY
-%token   TYPE_BODY_TAG TYPE_HEAD_BODY
-%token   <s> TYPE_VALUE
-
-%type	<kt> KeyType
+%token TYPE_TITLE TYPE_HEADER TYPE_STATS TYPE_PREBODY TYPE_FOOTER TYPE_BODY
+%token TYPE_BODY_TAG TYPE_HEAD_BODY
+%token <s> TYPE_VALUE
+%type  <kt> KeyType
 
 %%
 
