@@ -82,7 +82,7 @@ int main (int argc, char* argv [])
   };
 #endif
   
-  /* read all options - for now only -o */
+  /* read all options */
 #ifdef HAVE_GETOPT_LONG
   while ((opt = getopt_long(argc, argv, "ht:o:v", longopts, NULL)) != -1)
 #else
@@ -266,7 +266,7 @@ vector<struct Song*>* traverse_dir (char* begin)
         
         recursion = traverse_dir((char*)fp.str().c_str());
         all_songs->insert (all_songs->end(), recursion->begin(), recursion->end());
-        delete recursion; /* Already copied into all_songs */
+	delete recursion; /* Already copied into all_songs */
       }
 
       /* Not a directory, assumed to be a normal file */
