@@ -13,7 +13,7 @@ INCLUDES	= @TAGLIB_INCLUDE@ -I/usr/local/include
 LIBS		= @TAGLIB_LD@ -L/usr/local/lib @LIBS@ @BLIBS@
 
 SRCS_C		= lex.yy.c y.tab.c
-SRCS_CXX	= tagreport.cc templates.cc ftfuncs.cc util.cc
+SRCS_CXX	= tagreport.cc templates.cc ftfuncs.cc util.cc html.cc
 OBJS		= $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 
 NAME		= @PACKAGE_NAME@

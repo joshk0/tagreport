@@ -1,4 +1,4 @@
-AC_INIT(TagReport, [0.01a])
+AC_INIT(TagReport, [0.3])
 
 AC_CONFIG_HEADER([config.h])
 

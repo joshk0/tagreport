@@ -1,3 +1,17 @@
+TagReport 0.3 - Nov 14, 2003
+
+- Many many many new things, hence the version leap
+- FLAC support: started with forking metaflac, now uses libFLAC
+- Support for using libvorbisfile and libid3tag to process MP3s when
+  TagLib is not available
+- Piles of code cleanups
+- Fix a giant configure bug involving when we search for where the
+  preprocessor is
+- Add a man page in SGML. Should not have to be built by normal users,
+  though.
+- Move all tag/comment-retrieving code to ftfuncs.{cc,h}
+- Move all HTML-related code to html.cc
+
 TagReport 0.01a - Sep 20, 2003
 
-- Initial release somewhat fit for public consumption.
+- Initial (not public) release with templates support
