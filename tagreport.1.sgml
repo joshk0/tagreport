@@ -1,0 +1,128 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
+
+<refentry>
+  <refentryinfo>
+    <address>
+      <email>joshk@triplehelix.org</email>
+    </address>
+    <author>
+       <firstname>Joshua</firstname>
+       <surname>Kwan</surname>
+    </author>
+    <copyright>
+      <year>"2003"</year>
+      <holder>"joshk"</holder>
+    </copyright>
+    <date>September 23, 2003</date>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>tagreport</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>tagreport</refname>
+    <refpurpose>produces HTML playlists of MP3/Ogg directories</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>tagreport</command>
+
+      <arg><option>-h --help</option></arg>
+      <arg><option>-t --template</option> <replaceable>template</replaceable></arg>
+      <arg><option>-v --verbose</option></arg>
+      <arg><option>-o --output</option> <replaceable>file</replaceable></arg>
+      <arg><option>-f --force</option></arg>
+      <arg><replaceable>directory</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para><command>tagreport</command> is a program initially intended to
+    replace the Playlist-&gt;HTML function found in Winamp for Windows, but
+    is more powerful in some respects.</para>
+
+    <para>It currently only supports scanning of MP3 and Ogg Vorbis audio
+    files. Flac is forthcoming but not supported as of this version.</para>
+
+    <para>TagReport also supports customizable HTML templates using a simple
+    file format. Look in the def/ directory in the source for a sample one
+    which describes the format.</para>
+    
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <para>In the event that you did not have a suitable getopt_long at
+    compile time, the long options (prefixed with two dashes) will not
+    be available to you.</para>
+
+    <variablelist>
+    
+      <varlistentry>
+        <term><option>-h</option>, <option>--help</option>
+	</term>
+        <listitem>
+          <para>Shows the summary of options available.</para>
+        </listitem>
+      </varlistentry>
+     
+      <varlistentry>
+        <term><option>-t</option>, <option>--template</option>
+	</term>
+	<listitem>
+	  <para>Choose a template to use during HTML generation. You
+	  may either use an absolute path, or the name of the template
+	  file without the extension, in which case ./def/ and the
+	  install-time def/ directory will be searched.</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-v</option>, <option>--verbose</option>
+	</term>
+	<listitem>
+	  <para>Verbose output to stdout, useful for debugging.</para>
+	</listitem>
+      </varlistentry>
+	
+      <varlistentry>
+        <term><option>-o</option>, <option>--output</option>
+	</term>
+        <listitem>
+          <para>The file to which the final HTML is written to.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-f</option>, <option>--force</option></term>
+	<listitem>
+	<para>Continues when errors are detected in a template.</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>directory</option></term>
+	<listitem>
+	<para>Directory to traverse. If not specified, the current directory
+	will be the root of the traversal.</para>
+	</listitem>
+      </varlistentry>
+      
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>xmms(1).</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by Joshua Kwan &lt;joshk@triplehelix.org&gt;
+    for <command>tagreport</command>. It is published under the GNU General
+    Public License.</para>
+
+  </refsect1>
+</refentry>

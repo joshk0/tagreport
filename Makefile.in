@@ -2,6 +2,7 @@ CXX		= @CXX@
 LEX		= @LEX@
 YACC		= @YACC@
 INSTALL		= @INSTALL@
+DOCBOOK		= @DOCBOOK@
 
 CXXFLAGS	= @CXXFLAGS@ $(INCLUDES) $(DEFS)
 DEFS		= @DEBUG@ -DDATADIR=\"$(datadir)/\"
@@ -15,14 +16,15 @@ OBJS		= $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 
 NAME		= @PACKAGE_NAME@
 VERSION		= @PACKAGE_VERSION@
-exclusions	= .cvsignore autogen.sh CVS playlist.htm
+exclusions	= .cvsignore autogen.sh CVS playlist.htm tagreport.1.sgml
 
 prefix		= $(DESTDIR)@prefix@
 exec_prefix	= @exec_prefix@
 bindir		= @bindir@
 datadir		= @datadir@
+mandir		= @mandir@
 
-all: tagreport
+all: tagreport tagreport.1
 
 %.o: %.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -30,6 +32,11 @@ all: tagreport
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+tagreport.1: $(wildcard tagreport.1.sgml)
+	$(DOCBOOK) $< > $@~
+	sed -n "`grep -n '^.TH' $@~ | awk -F : '{print $$1}'`~1p" $@~ > $@2~
+	rm -f $@~; mv -f $@2~ $@
+	
 tagreport: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
 
@@ -49,14 +56,19 @@ y.tab.c: templates.h
 
 clean:
 	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~
+ifneq (,$(wildcard tagreport.1.sgml))
+	rm -f tagreport.1
+endif
 
 distclean: clean
 	rm -f Makefile config.status config.log config.h .depend
 	rm -rf autom4te.cache
 
-install: tagreport
+install: tagreport tagreport.1
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) -m 755 tagreport $(bindir)
+	$(INSTALL) -d $(mandir)/man1
+	$(INSTALL) -m 644 tagreport.1 $(mandir)/man1
 	$(INSTALL) -d $(datadir)/def
 	
 	@for file in $(wildcard def/*.def); do \
@@ -66,22 +78,23 @@ install: tagreport
 
 uninstall:
 	rm -f $(bindir)/tagreport
+	rm -f $(mandir)/man1/tagreport.1
 	@for file in $(wildcard def/*.def); do \
 	  echo rm -f $(datadir)/$$file; \
 	  rm -f $(datadir)/$$file; \
 	done
 	-rmdir $(datadir)/def && rmdir $(datadir)
 
-dist: distclean
+dist: distclean tagreport.1
 	autoheader
 	autoconf
 	rm -rf autom4te.cache *~
 ifeq (,$(wildcard install-sh))
 	cp -f /usr/share/automake/install-sh .
 endif
+	rm -rf ../$(NAME)-$(VERSION)
 	(cd .. && ln -sf $(CURDIR) $(NAME)-$(VERSION))
 	(cd .. && tar $(addprefix --exclude ,$(exclusions)) -chzf $(NAME)-$(VERSION).tar.gz $(NAME)-$(VERSION))
-	rm -rf ../$(NAME)-$(VERSION)
 	@echo; echo "Created source release $(VERSION):"; echo
 	@md5sum ../$(NAME)-$(VERSION).tar.gz
 	@echo
