@@ -1,6 +1,6 @@
 CC = gcc
 CXX = g++
-CFLAGS = -g -Wall -O0
+CFLAGS = -g -W -Wall -O0
 CXXFLAGS = $(CFLAGS)
 
 all: tagreport maildirtree
@@ -10,6 +10,8 @@ tagreport: tagreport.cc
 
 maildirtree: maildirtree.c
 	$(CC) $(CFLAGS) $< -o $@
+
+maildirtree.c: maildirtree.h
 
 clean:
 	rm -f tagreport maildirtree *.o core a.out
