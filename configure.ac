@@ -59,12 +59,7 @@ CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
 CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
-AC_CHECK_FUNCS(getopt_long, ,
-[
-  AC_SUBST(GETOPT_SRCS,[lib/getopt.c lib/getopt1.c])
-  AC_DEFINE(HAVE_LIB_GETOPT_H, 1, [Define if you are using the support getopt.])
-])
-
+AC_CHECK_FUNCS(getopt_long)
 AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
