@@ -61,7 +61,6 @@ extern FILE *yyin;
 static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
 static void clean (vector<char*> & dirs);
-static void verify (vector<char*> & targets);
 
 #ifdef NDEBUG
 bool verbose = false;
@@ -181,8 +180,10 @@ int main (int argc, char* argv [])
     targets.push_back(target);
   }
 
+  /* Weed out the paths that do not exist. */
   verify (targets);
 
+  /* They ALL don't exist? */
   if (targets.size() == 0)
   {
     cout << "All targets invalidated! :( Exiting." << endl;
@@ -483,23 +484,3 @@ void clean (vector<char*> & dirs)
   for (t = dirs.begin(); t != dirs.end(); t++)
     free (*t);
 }
-
-static void verify (vector<char*> & targets)
-{
-  vector<char*>::iterator t;
-  struct stat id;
-
-  for (t = targets.begin(); t != targets.end(); t++)
-  {
-    DEBUG("Now at", *t);
-
-    if (stat(*t, &id) == -1 || !S_ISDIR(id.st_mode))
-    {
-      cerr << "Error opening " << *t << ": not a directory!" << endl;
-      targets.erase(t);
-
-      t--;
-    }
-  }
-}
-

@@ -132,3 +132,23 @@ char* comma_delineate (const vector<char*> & in)
 
   return strdup(a.str().c_str());
 }
+
+void verify (vector<char*> & targets)
+{
+  vector<char*>::iterator t;
+  struct stat id;
+
+  for (t = targets.begin(); t != targets.end(); t++)
+  {
+    DEBUG("Now at", *t);
+
+    if (stat(*t, &id) == -1 || !S_ISDIR(id.st_mode))
+    {
+      cerr << "Error opening " << *t << ": not a directory!" << endl;
+      targets.erase(t);
+
+      t--;
+    }
+  }
+}
+
