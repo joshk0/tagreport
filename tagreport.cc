@@ -373,18 +373,18 @@ vector<struct Song*>* traverse_dir (char* begin)
             *e = tolower(*e);
         }
 #ifdef HAVE_METAFLAC
-	if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
+        if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
         {
           metaflac(tmpsong, fp.str().c_str());
 
-	  if (tmpsong->title == "" || tmpsong->artist == "")
+          if (tmpsong->title == "" || tmpsong->artist == "")
             delete tmpsong; /* Just ignore it. */
-	  else
+          else
             all_songs->push_back(tmpsong);
         }
-	
+
         /* Ogg Vorbis or MP3 file? */
-	else if (ext == "ogg" || ext == "mp3")
+        else if (ext == "ogg" || ext == "mp3")
 #else
         if (ext == "ogg" || ext == "mp3")
 #endif
