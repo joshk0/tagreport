@@ -68,11 +68,6 @@ int main (int argc, char* argv [])
   ostringstream tmpout;
   char *target = NULL, *outfile = NULL;
   int opt;
-  unsigned int i;
-  ofstream out;
-
-  /* XXX - suppress a warning */
-  (void)replacehtml;
 
 #ifdef HAVE_GETOPT_LONG
   struct option longopts [] = {
@@ -148,6 +143,9 @@ int main (int argc, char* argv [])
   {
     while (optind < argc)
       targets.push_back(strdup(argv[optind++]));
+    
+    /* Weed out the paths that do not exist. */
+    verify (targets);
   }
   /* Scan the current directory tree by default. */
   else
@@ -157,10 +155,7 @@ int main (int argc, char* argv [])
     targets.push_back(target);
   }
 
-  /* Weed out the paths that do not exist. */
-  verify (targets);
-
-  /* They ALL don't exist? */
+  /* No valid paths? */
   if (targets.size() == 0)
   {
     cout << "All targets invalidated! :( Exiting." << endl;
@@ -181,68 +176,23 @@ int main (int argc, char* argv [])
   
   for (t = targets.begin(); t != targets.end(); t++)
   {
-    vector<struct Song*>* this_dir = NULL;
-    this_dir = traverse_dir(*t);
+    vector<struct Song*>* this_dir = traverse_dir(*t);
 
-    /* Append this directory */
-
+    /* Append subsequent traversals to all_songs */
     if (all_songs != NULL)
     {
-      /* Append this_dir's contents to all_songs */
       all_songs->insert (all_songs->end(), this_dir->begin(), this_dir->end());
-
-      /* Do not clean() the vector because you will be freeing the pointers */
       delete this_dir;
     }
     else
-    {
-      /* This is the first directory, so it only contains this_dir */
       all_songs = this_dir;
-    }
   }
 
   if (verbose)
     cout << endl;
-   
-  out.open (tmpout.str().c_str(), ios::out | ios::trunc);
-
-  if (!out.is_open())
-  {
-    cerr << "Failed to open file " << tmpout.str() << ": " << strerror(errno) << endl;
-    return 1;
-  }
-    
-  /* Write out canned headers to the target file */
-  out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
-
-  OUTPUT_HEADER(out, all_songs, target, template_title);
-  out << "</title>" << endl;
-
-  /* For CSS and JavaScript and such... */
-  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_head_body);
-  out << "</head>" << endl;
-
-  OUTPUT_HEADER(out, all_songs, target, template_body_tag);
-  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_header);
-    
-  /* Some statistics ... */
-  OUTPUT_HEADER(out, all_songs, target, template_stats);
-    
-  /* Use literally. */
-  OUTPUT_HEADER_IF_SET(out, all_songs, target, template_prebody);
-    
-  /* Loop through the vector and HTML-output its contents. */
-  assert (template_body.is_set());
-  for (i = 0; i < all_songs->size(); i++)
-    OUTPUT_BODY(out, (*all_songs)[i], i + 1);
-
-  /* Footer output. Treated as a header for processing purposes. */
-  OUTPUT_HEADER(out, all_songs, target, template_footer);
-  out << "</body>\n</html>" << endl;
-
-  /* Flush the file and close it */
-  out.close();
-
+  
+  write_html (tmpout.str().c_str(), all_songs, target);
+ 
   /* Move temporary file to the real thing */
   if (rename (tmpout.str().c_str(), outfile) == -1)
   {

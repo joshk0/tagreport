@@ -12,7 +12,6 @@ using namespace std;
 char* get_time_string (void);
 char* guess_fn (char* a);
 char* comma_delineate (const vector<char*> & in);
-void htmlify (string &);
 void verify (vector<char*> & targets);
 void clean (vector<struct Song*>* root);
 void clean (vector<char*> & dirs);

@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "ftfuncs.h"
-#include "util.h"
+#include "html.h"
 
 #include <cassert>
 #include <cctype>

@@ -3,6 +3,11 @@
 #ifndef INCLUDED_html_h
 #define INCLUDED_html_h
 
+#include <vector>
+#include <string>
+
+using namespace std;
+
 /* Headers and footers */
 const char HTMLdtd [] =
 "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n\
@@ -13,5 +18,9 @@ const char HTMLdtd [] =
 /* Character escaping for HTML */
 static const char replacechars [] = { '&', '<', '>', '\"' };
 static const char* replacehtml [] = { "&amp;", "&lt;", "&gt;", "&quot;" };
+
+/* Useful functions */
+void htmlify (string &);
+void write_html (const char*, vector<struct Song*>*, char*);
 
 #endif
