@@ -55,20 +55,20 @@ string replace_header (const string & in, int count, const string & directory)
       {
         case COUNT:
           s << count;
-         break;
-
-       case DATE:
-         t = get_time_string();
-         s << t;
-         free(t);
           break;
 
-       case DIRECTORY:
-         s << directory;
-         break;
+        case DATE:
+          t = get_time_string();
+          s << t;
+          free(t);
+          break;
 
-       default: /* wtf dude */
-         abort();
+        case DIRECTORY:
+          s << directory;
+          break;
+
+        default: /* wtf dude */
+          abort();
       }
       
       out.replace (j, header_map[i].term_length, s.str());
