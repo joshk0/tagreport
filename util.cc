@@ -30,7 +30,9 @@ char* get_time_string (void)
   char now_date[18];
 
   /* Get the current time */
-  time(&now_secs);
+  if (!time(&now_secs))
+    perror("time");
+
   now = localtime(&now_secs);
   strftime (now_date, 18, "%H:%M, %Y-%m-%d", now);
 
@@ -40,7 +42,7 @@ char* get_time_string (void)
 /* Escapes illegal HTML characters into their long counterparts. */
 void htmlify (string & in)
 {
-  unsigned int c, i, s;
+  unsigned int c, i;
 
   /* replace each found character in replacechars by respective 
    * entry in replacehtml */
@@ -57,8 +59,8 @@ void htmlify (string & in)
    * i.e. htmlify("  ") should become " &nbsp;", but it becomes
    * "&nbsp;&nbsp;" */
   
-  while ((s = in.find("  ")) != string::npos)
-      in.replace(s, 2, "&nbsp;&nbsp;");
+  while ((c = in.find("  ")) != string::npos)
+      in.replace(c, 2, "&nbsp;&nbsp;");
 }
 
 char* guess_fn (char* a)
@@ -72,9 +74,9 @@ char* guess_fn (char* a)
 
   /* Conditions:
    *
-   * 1. Path is not absolute
+   * 1. Path is not absolute (prefixed with a forward slash)
    *
-   * and
+   * and either
    *
    * 2. The filename has no extension
    *

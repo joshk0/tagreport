@@ -73,7 +73,7 @@ int main (int argc, char* argv [])
   bool already_template = false;
   vector <struct Song*>* all_songs = NULL;
   vector <char*> targets;
-  vector<char*>::iterator t;
+  vector <char*>::iterator t;
   ostringstream tmpout;
   char *target = NULL, *outfile = NULL;
   int opt;
@@ -162,7 +162,8 @@ int main (int argc, char* argv [])
       free(template_fn);
     }
   }
-  
+ 
+  /* Add all targets on the command line. */
   if (optind < argc)
   {
     while (optind < argc)
@@ -215,11 +216,17 @@ int main (int argc, char* argv [])
 
     if (all_songs != NULL)
     {
+      /* Append this_dir's contents to all_songs */
       all_songs->insert (all_songs->end(), this_dir->begin(), this_dir->end());
+
+      /* Do not clean() the vector because you will be freeing the pointers */
       delete this_dir;
     }
     else
+    {
+      /* This is the first directory, so it only contains this_dir */
       all_songs = this_dir;
+    }
   }
 
   if (verbose)
