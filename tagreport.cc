@@ -49,7 +49,6 @@ int main (int argc, char* argv [])
 
 void traverse_dir (char* begin)
 {
-  /* XXX NOT DONE XXX */
   DIR* root;
   struct dirent * contents;
   struct stat dino;
@@ -57,12 +56,11 @@ void traverse_dir (char* begin)
   TagLib::Tag *tag;
   
   if ((root = opendir(begin)) != NULL) {
-    /* DURRRRRRRRRRRRRRRRRRR  not done yet */
     while ((contents = readdir(root)) != NULL)
     {
-
       asprintf(&fullpath, "%s/%s", begin, contents->d_name);
-      
+
+      /* Skip .. and . */
       if (!strcmp(contents->d_name, ".") || !strcmp(contents->d_name, ".."))
       {
 #ifdef DEBUG
@@ -71,6 +69,7 @@ void traverse_dir (char* begin)
         continue;
       }
 
+      /* Recurse if this entry is actually a directory */
       stat (fullpath, &dino);
       if (dino.st_mode & S_IFDIR) {
 #ifdef DEBUG
@@ -79,6 +78,7 @@ void traverse_dir (char* begin)
         traverse_dir(fullpath);
       }
 
+      /* Otherwise, it's a normal file */
       else {
         /* Skip filenames with no extension */
         if ((comp = strrchr(contents->d_name, '.')) == NULL)
@@ -88,22 +88,27 @@ void traverse_dir (char* begin)
 #endif
           continue;
 	}
-        if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
-          TagLib::FileRef ref (new TagLib::VorbisFile(fullpath));
+	
+	/* Ogg Vorbis file? */
+        if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")) {
+          TagLib::FileRef ref (fullpath);
   	  tag = ref.tag();
 #ifdef DEBUG
           printf("OGG: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
 #endif
 	}
      
-	else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
-          TagLib::FileRef ref (new TagLib::VorbisFile(fullpath));
+	/* MP3 file? */
+	else if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
+          TagLib::FileRef ref (fullpath);
   	  tag = ref.tag();
 #ifdef DEBUG
- 	  printf("MP3: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
+ 	  printf("file: %s - %s\n", tag->artist().toCString(), tag->title().toCString());
 #endif
   	}
+	
 #ifdef DEBUG
+	/* Note that we did not do anything with this file */
         else {
           fprintf(stderr, "DEBUG: skipping unrecognized file %s\n", contents->d_name, contents->d_type);
         }
@@ -113,8 +118,9 @@ void traverse_dir (char* begin)
       free (fullpath);
     }
   }
+  /* If we get here there was SOME sort of error with opendir() */
   else {
-    printf ("%s: Error reading directory: %s\n", invoked_as, strerror(errno));
+    fprintf (stderr, "%s: Error reading directory: %s\n", invoked_as, strerror(errno));
     return;
   }
 
