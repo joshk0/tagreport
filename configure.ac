@@ -53,16 +53,17 @@ datadir="$datadir/tagreport"
 save_CXXFLAGS="$CXXFLAGS"
 save_CPPFLAGS="$CPPFLAGS"
 
+CXXFLAGS="$CXXFLAGS -I/usr/local/include -L/usr/local/lib"
+CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+
 if test -z "$TAGLIB_ROOT"; then
   AC_MSG_RESULT([not found])
-  CXXFLAGS="$CXXFLAGS -I/usr/local/include -L/usr/local/lib"
-  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 else
   AC_MSG_RESULT($TAGLIB_ROOT)
   AC_SUBST(TAGLIB_ROOT)
 
-  CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
-  CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include"
+  CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
+  CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
   AC_CHECK_HEADER(tag.h,
   [
@@ -75,9 +76,6 @@ else
       use_TAGLIB=1
     ])
   ])
-
-  CXXFLAGS="$save_CXXFLAGS -I/usr/local/include -L/usr/local/lib"
-  CPPFLAGS="$save_CPPFLAGS -I/usr/local/include"
 fi
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
