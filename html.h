@@ -3,10 +3,8 @@
 #ifndef INCLUDED_html_h
 #define INCLUDED_html_h
 
-#include <string>
-
 /* Headers and footers */
-const std::string HTMLdtd =
+const char HTMLdtd [] =
 "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n\
 <!DOCTYPE html\n\
      PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
