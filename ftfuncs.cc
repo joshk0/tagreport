@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cctype>
 #include <cstring>
+
 #include <string>
 
 using namespace std;
@@ -22,15 +23,15 @@ using namespace std;
 #include <vorbis/vorbisfile.h>
 #endif
 
+#ifdef USE_FLAC
+#include <FLAC/metadata.h>
+#endif
+
 #ifdef USE_ID3TAG
 #include <id3tag.h>
 #endif
 
 #ifdef USE_FLAC
-
-/* libFLAC includes */
-#include <FLAC/metadata.h>
-
 /* Read path using libFLAC and retrieve vorbis comments ARTIST
  * and TITLE. Returns true or false depending on success, but we
  * check for string blankness anyway back in traverse_dir. */
@@ -47,25 +48,20 @@ bool get_flac (struct Song* flac, const char* path)
     if (FLAC__metadata_simple_iterator_get_block_type(it) ==
           FLAC__METADATA_TYPE_VORBIS_COMMENT)
     {
-      unsigned nc;
+      unsigned j;
       
-      FLAC__StreamMetadata *sm;
-      FLAC__StreamMetadata_VorbisComment_Entry *e;
-      
-      sm = FLAC__metadata_simple_iterator_get_block(it);
+      FLAC__StreamMetadata *sm = FLAC__metadata_simple_iterator_get_block(it);
+      FLAC__StreamMetadata_VorbisComment_Entry *e = sm->data.vorbis_comment.comments;
 
-      nc = sm->data.vorbis_comment.num_comments;
-      e = sm->data.vorbis_comment.comments;
-      
-      for (; nc > 0; nc--)
+      for (j = 0; j < sm->data.vorbis_comment.num_comments; j++)
       {
         unsigned i;
         int eq;
         string field, fname;
 
         /* XXX - no way to get a clean e->entry? */
-        for (i = 0; i < e->length; i++)
-          field += e->entry[i];
+        for (i = 0; i < e[j].length; i++)
+          field += e[j].entry[i];
 
         eq = field.find('=');
         assert (eq != string::npos);
@@ -89,8 +85,6 @@ bool get_flac (struct Song* flac, const char* path)
           FLAC__metadata_simple_iterator_delete (it);
           return true;
         }
-        
-        e++;
       }
 
       FLAC__metadata_simple_iterator_delete (it);
@@ -211,6 +205,7 @@ bool get_ogg (struct Song * ogg, const char * path)
 #ifdef USE_ID3TAG
 bool get_mp3 (struct Song *mp3, const char* path)
 {
+  bool found_title = false, found_artist = false;
   struct id3_file *m = NULL;
   struct id3_tag *tag = NULL;
   union id3_field *field = NULL;
@@ -219,10 +214,10 @@ bool get_mp3 (struct Song *mp3, const char* path)
 
   /* The program will think up the right title :) */
   if (!(m = id3_file_open (path, ID3_FILE_MODE_READONLY)))
-    return true;
+    return false;
   
   if (!(tag = id3_file_tag (m)))
-    return true;
+    return false;
   
   if ((frame = id3_tag_findframe (tag, ID3_FRAME_TITLE, 0)))
   {
@@ -232,6 +227,7 @@ bool get_mp3 (struct Song *mp3, const char* path)
       {
         mp3->title = (const char*) id3_ucs4_latin1duplicate(str);
         htmlify(mp3->title);
+        found_title = true;
       }
     }
   }
@@ -244,12 +240,13 @@ bool get_mp3 (struct Song *mp3, const char* path)
       {
         mp3->artist = (const char*) id3_ucs4_latin1duplicate(str);
         htmlify(mp3->artist);
+        found_artist = true;
       }
     }
   }
   
   id3_file_close (m);
-  return true;
+  return (found_title && found_artist);
 }
 #endif /* USE_ID3TAG */
 
@@ -326,7 +323,7 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
   }
 
 skipextcheck:
-  if (!(*getfunc)(song, fn.c_str()) || 
+  if (!getfunc(song, fn.c_str()) || 
       (song->title == "" && song->artist == ""))
   {
     song->title = NOPATHEXT(fn, begin);
