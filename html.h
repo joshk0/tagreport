@@ -28,4 +28,9 @@ static std::string HTMLfooter =
 static char replacechars [] = { '&', '<', '>' };
 static char* replacehtml [] = { "&amp;", "&lt;", "&gt;" };
 
+/* Easter egg quote. */
+static std::string noMusicQuote =
+"<i>Without music, life would be an error. The German imagines even God singing songs.</i><br />\n\
+-- Friedrich Nietzsche<br />\n";
+
 #endif

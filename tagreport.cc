@@ -85,8 +85,11 @@ int main (int argc, char* argv [])
   if (optind < argc)
     target = strdup(argv[optind]);
   else
-    target = strdup(getcwd());
-    
+  {
+    target = (char*)malloc(PATH_MAX + 1);;
+    getcwd(target, PATH_MAX);
+  }
+
   stat (target, &id);
   
   if (S_ISDIR(id.st_mode))
@@ -149,10 +152,7 @@ int main (int argc, char* argv [])
 
     /* Snicker, snicker! */
     if (all_songs->size() == 0)
-    {
-      out << "<i>Without music, life would be an error. The German imagines even God singing songs.</i><br />" << endl;
-      out << "-- Friedrich Nietzsche<br />" << endl;
-    }
+      out << noMusicQuote;
 
     out << HTMLfooter;
 
