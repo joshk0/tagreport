@@ -31,6 +31,9 @@ prebody = "<table>\n<tr><th>Artist</th><th>Song Title</th></tr>"
 # $artist - Artist of the current song
 # $title - Title of the current song
 #
+# If a song has no tag or an incomplete one, only $title will be filled, and
+# $artist will be empty.
+#
 # body will be written to the file (with substitutions made) for each song,
 # so in this case it is a complete table row.
 
