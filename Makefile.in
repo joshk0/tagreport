@@ -45,7 +45,7 @@ lex.yy.c: templates.h y.tab.h
 y.tab.c: templates.h
 
 .depend: $(SRCS_CXX)
-	$(CXX) -MM $(SRCS_CXX) > .depend
+	$(CXX) $(INCLUDES) -MM $(SRCS_CXX) > .depend
 
 clean:
 	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~

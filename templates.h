@@ -4,7 +4,7 @@
 #define INCLUDED_templates_h
 
 #include <string>
-#include <sys/types.h>
+#include <stdio.h>
 
 using namespace std;
 
