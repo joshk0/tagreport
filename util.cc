@@ -153,19 +153,20 @@ void verify (vector<char*> & targets)
   }
 }
 
+#ifdef HAVE_METAFLAC
+/* Fork metaflac for a file with path path and get its artist and title
+ * comment fields. */
 struct Song * metaflac (const char* path)
 {
-#ifndef HAVE_METAFLAC
-  DEBUG("No metaflac, will not process", path);
-  return NULL;
-#else
   FILE* mf;
   ostringstream cmd;
   char buf[1024];
+  unsigned int i;
   struct Song *flac = new struct Song;
-
+  string fn = path;
+  
   /* Ewwwww! Sick! */
-  cmd << "metaflac --show-vc-field=artist --show-vc-field=title " << path;
+  cmd << "metaflac --show-vc-field=artist --show-vc-field=title \"" << path  << "\"";
   mf = popen(cmd.str().c_str(), "r");
 
   while (fgets(buf, 1024, mf) != NULL)
@@ -185,5 +186,5 @@ struct Song * metaflac (const char* path)
   pclose(mf);
   
   return flac;
-#endif
 }
+#endif
