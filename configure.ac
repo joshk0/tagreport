@@ -66,6 +66,8 @@ else
   [
     AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
     AC_SUBST(TAGLIB, [-ltag])
+    AC_SUBST(TAGLIB_INCLUDE, [-I\$\(TAGLIB_ROOT\)/include/taglib])
+    AC_SUBST(TAGLIB_LD, [-L\$\(TAGLIB_ROOT\)/lib])
     use_TAGLIB=1
   ])
 

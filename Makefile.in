@@ -9,8 +9,8 @@ DOCBOOK		= @DOCBOOK@
 CXXFLAGS	= @CXXFLAGS@ $(INCLUDES)
 DEFS		= @DEBUG@ -DDATADIR=\"$(datadir)/\"
 TAGLIB_ROOT	= @TAGLIB_ROOT@
-INCLUDES	= -I$(TAGLIB_ROOT)/include/taglib -I/usr/local/include
-LIBS		= -L$(TAGLIB_ROOT)/lib -L/usr/local/lib @TAGLIB@ @FLACLIB@ @OGGLIB@ @ID3TAGLIB@
+INCLUDES	= @TAGLIB_INCLUDE@ -I/usr/local/include
+LIBS		= @TAGLIB_LD@ -L/usr/local/lib @TAGLIB@ @FLACLIB@ @OGGLIB@ @ID3TAGLIB@
 
 SRCS_C		= lex.yy.c y.tab.c
 SRCS_CXX	= tagreport.cc templates.cc ftfuncs.cc util.cc
