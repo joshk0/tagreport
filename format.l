@@ -57,4 +57,5 @@ COMMENT		^#.*
 "body"		{ return TYPE_BODY; }
 "bodytag"	{ return TYPE_BODY_TAG; }
 
+.		{ cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template, bailing out!" << endl; exit(1); }
 %%

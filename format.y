@@ -96,8 +96,8 @@ KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 
 %%
 
-void yyerror(const char* s)
+void yyerror(char const* s)
 {
-  cerr << "couldn't parse \"" << yytext << "\": " << s << endl;
+  cerr << "Couldn't parse \"" << yytext << "\": " << s << endl;
   exit(1);
 }
