@@ -33,7 +33,9 @@ extern char *yytext;
 
 %%
 
-Template: KeyPairs;
+Template: KeyPairs
+	| { cerr << "Error: template file has no settings, continuing with defaults." << endl << "This is probably not what you want!" << endl; }
+	;
 
 KeyPairs: KeyPairs KeyPair
 	| KeyPair
