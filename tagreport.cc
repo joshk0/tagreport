@@ -51,7 +51,6 @@ extern int yyparse (void);
 
 static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
-static void htmlify (string &);
 
 #ifdef NDEBUG
 bool verbose = false;
@@ -431,26 +430,4 @@ void clean (vector<struct Song *> * root)
   delete root;
 }
 
-/* Escapes illegal HTML characters into their long counterparts. */
-static void htmlify (string & in)
-{
-  unsigned int c, i, s;
 
-  /* replace each found character in replacechars by respective 
-   * entry in replacehtml */
-  for (c = 0; c < in.length(); c++)
-  {
-    for (i = 0; i < 3; i++)
-    {
-      if (in[c] == replacechars[i])
-        in.replace (c, 1, replacehtml[i]);
-    }
-  }
-
-  /* replace spaces with two &nbsp;, it's the slightest bit overkill
-   * i.e. htmlify("  ") should become " &nbsp;", but it becomes
-   * "&nbsp;&nbsp;" */
-  
-  while ((s = in.find("  ")) != string::npos)
-      in.replace(s, 2, "&nbsp;&nbsp;");
-}
