@@ -6,14 +6,16 @@ TagReport installation
 * GNU make ('make' on a Linux system, 'gmake' on others)
 * GNU g++, or any other ISO C++ compiler, probably works..
 * flex and bison (any recent versions should do)
-* Some kind of getopt implementation.
+* Some kind of getopt implementation. (i.e. libgnugetopt in FreeBSD or as
+  part of GNU libc)
 * libFLAC (part of the flac distribution) if you want FLAC support
+  Retrievable at http://flac.sourceforge.net or libflac-dev in Debian
 * TagLib. Please retrieve the source from:
 
     http://ktown.kde.org/~wheeler/taglib/taglib-cvs.tar.gz
 
   There has not been a formal release yet. It's highly alpha code, and
-  even does not build on Solaris. So watch out!
+  does not even build on Solaris. So watch out!
 
 2. Method
 
