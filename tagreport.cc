@@ -243,10 +243,7 @@ int main (int argc, char* argv [])
  
   /* Miscellaneous memory management */
   if (all_songs)
-  {
     clean(all_songs);
-    delete all_songs;
-  }
 
   free(target);
   free(outfile);
@@ -430,6 +427,8 @@ void clean (vector<struct Song *> * root)
   /* All strings are on the stack, we don't need to do anything with them */
   for (v = root->begin(); v != root->end(); v++)
     delete *v;
+
+  delete root;
 }
 
 /* Escapes illegal HTML characters into their long counterparts. */

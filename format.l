@@ -14,6 +14,7 @@ using namespace std;
 #include "y.tab.h"
 #include "templates.h"
 
+/* Instruct lex to look in template_file for input. */
 #define YY_INPUT(buf, result, max_size) \
 { \
   char * buff; \

@@ -75,14 +75,14 @@ KeyPair: KeyType '=' TYPE_VALUE {
 
     case TYPE_BODY_TAG:
       if (template_body_tag.is_set())
-        WARN_SHADOW("body tag");
+        WARN_SHADOW("bodytag");
 
       template_body_tag.set ($3);
       break;
 
     case TYPE_HEAD_BODY:
       if (template_head_body.is_set())
-        WARN_SHADOW("<HEAD> tag contents");
+        WARN_SHADOW("headbody");
 
       template_head_body.set ($3);
       break;
