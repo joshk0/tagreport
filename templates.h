@@ -4,6 +4,8 @@
 #define INCLUDED_templates_h
 
 #include <string>
+#include <sys/types.h>
+
 using namespace std;
 
 class key
@@ -19,10 +21,12 @@ class key
     string keyVal;
 };
 
-key template_title;
-key template_header;
-key template_prebody;
-key template_stats;
-key template_body;
+extern key template_title;
+extern key template_header;
+extern key template_prebody;
+extern key template_stats;
+extern key template_body;
+
+extern FILE * template_file;
 
 #endif

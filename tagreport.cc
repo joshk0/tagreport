@@ -17,6 +17,7 @@
 
 #include "tagreport.h"
 #include "html.h"
+#include "templates.h"
 
 /* TagLib includes */
 #include <fileref.h>
@@ -64,6 +65,8 @@ int main (int argc, char* argv [])
   char *target = NULL, *outfile = NULL;
   int opt;
   
+  template_file = NULL;
+  
   /* read all options - for now only -o */
   while ((opt = getopt(argc, argv, "o:v")) != -1)
   {
@@ -76,6 +79,10 @@ int main (int argc, char* argv [])
       case 'v':
         verbose = true;
         break;
+
+      case 't':
+        if ((template_file = fopen (optarg, "r")) == NULL)
+          cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
         
       case '?':
         return 1;

@@ -15,4 +15,6 @@ struct Song
   std::string artist;
 };
 
+extern bool verbose;
+
 #endif

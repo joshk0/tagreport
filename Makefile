@@ -1,7 +1,11 @@
 CXX = g++
-CXXFLAGS = -g3 -W -Wall -O0 $(INCLUDES) $(DEFS)
+CXXFLAGS = -g -W -Wall -O0 $(INCLUDES) $(DEFS)
 DEFS = -DNDEBUG
-OBJS = tagreport.o lex.yy.o y.tab.o
+
+SRCS_C = lex.yy.c y.tab.c
+SRCS_CXX = tagreport.cc templates.cc
+OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
+
 INCLUDES = -I/usr/local/include/taglib
 LIBS = -ltag -ll
 
@@ -10,21 +14,25 @@ all: tagreport
 %.o: %.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+%.o: %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 tagreport: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
-
-tagreport.cc: html.h tagreport.h
 
 lex.yy.c: format.l
 	flex -d $<
 
-y.tab.c: format.y
+y.tab.h y.tab.c: format.y
 	bison -d -y $<
 
-y.tab.h: y.tab.c
+lex.yy.c: templates.h y.tab.h
+y.tab.c: templates.h 
 
-format.y: templates.h
-format.l: y.tab.h
+.depend: $(SRCS_CXX)
+	$(CXX) -MM $(SRCS_CXX) > .depend
 
 clean:
 	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~
+
+-include .depend
