@@ -18,7 +18,7 @@ char* get_time_string (void)
     /* Get the current time */
     time(&now_secs);
     now = localtime(&now_secs);
-    strftime (now_date, 18, "%H:%M, %F", now);
+    strftime (now_date, 18, "%H:%M, %Y-%m-%d", now);
 
     return strdup(now_date);
 }
