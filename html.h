@@ -13,7 +13,7 @@ const std::string HTMLdtd =
      \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
 	  
 /* Character escaping for HTML */
-static char replacechars [] = { '&', '<', '>' };
-static char* replacehtml [] = { "&amp;", "&lt;", "&gt;" };
+static char replacechars [] = { '&', '<', '>', '\"' };
+static char* replacehtml [] = { "&amp;", "&lt;", "&gt;", "&quot;" };
 
 #endif

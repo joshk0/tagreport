@@ -38,7 +38,7 @@ void htmlify (string & in)
    * entry in replacehtml */
   for (c = 0; c < in.length(); c++)
   {
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 4; i++)
     {
       if (in[c] == replacechars[i])
         in.replace (c, 1, replacehtml[i]);
