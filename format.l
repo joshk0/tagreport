@@ -15,17 +15,6 @@ using namespace std;
 #include "templates.h"
 #include "tagreport.h"
 
-/* Instruct lex to look in template_file for input. */
-#define YY_INPUT(buf, result, max_size) \
-{ \
-  char * buff; \
-\
-  if ((buff = fgets (buf, max_size, template_file)) == NULL) \
-    result = 0; \
-  else \
-    result = strlen(buf); \
-}
-
 %}
 
 VALUE		\".*\"

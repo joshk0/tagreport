@@ -52,6 +52,7 @@
 using namespace std;
 
 extern int yyparse (void);
+extern FILE *yyin;
 
 static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
@@ -140,6 +141,7 @@ int main (int argc, char* argv [])
     }
     else
     {
+      yyin = template_file;
       yyparse();
       fclose(template_file);
       free(template_fn);
