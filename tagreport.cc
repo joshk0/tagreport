@@ -18,6 +18,7 @@
 #include "tagreport.h"
 #include "html.h"
 #include "templates.h"
+#include "util.h"
 
 /* TagLib includes */
 #include <fileref.h>
@@ -37,7 +38,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 
 /* C system headers */
 #include <sys/types.h>
@@ -129,9 +129,6 @@ int main (int argc, char* argv [])
       return 1;
     }
     
-    /* Write out canned headers */
-    out << HTMLdtd << HTMLheader;
-    
     if (verbose)
       cout << "Scanning ";
     
@@ -140,39 +137,78 @@ int main (int argc, char* argv [])
     if (verbose)
       cout << endl;
     
+    /* Write out canned headers */
+    out << HTMLdtd << "<html>\n<head>\n<title>" << endl;
+
+    if (template_title.is_set())
+      out << replace_header (template_title.get(), all_songs->size(), target);
+    else
+      out << "TagReport Generated Playlist";
+
+    out << endl << "</title>" << endl;
+
+    /* For CSS and JavaScript and such... */
+    if (template_head_body.is_set())
+      out << replace_header (template_head_body.get(), all_songs->size(), target) << endl;
+   
+    if (template_body_tag.is_set())
+      out << replace_header (template_body_tag.get(), all_songs->size(), target);
+    else
+      out << "<body bgcolor=\"#000000\" text=\"#FFFFFF\">";
+  
+    if (template_header.is_set())
+      out << replace_header (template_header.get(), all_songs->size(), target) << endl;
+
     /* Some statistics ... */
     
     if (template_stats.is_set())
     {
-      out << replace_header (all_songs->size());
+      out << replace_header (template_stats.get(), all_songs->size(), target) << endl;
     }
     else
     {
-      out << target << "</h2><hr />" << endl;
-      out << "<p>Generated at " << now_date << "<br />" << endl;
+      char* now = get_time_string();
+      
+      out << "<h2>" << target << "</h2><hr />" << endl;
+      out << "<p>Generated at " << now << "<br />" << endl;
       out << "Scanned " << all_songs->size() << " songs.</p>" << endl;
       out << "<p>";
+
+      free(now);
     }
+    
+    /* Use literally. */
+    if (template_prebody.is_set())
+      out << replace_header(template_prebody.get(), all_songs->size(), target) << endl;
     
     /* Loop through the vector and HTML-output its contents. */
     for (i = 0; i < all_songs->size(); i++)
     {
-      if ((*all_songs)[i]->artist != "")
+      if (template_body.is_set())
       {
-        out << i+1 << ". "
-            << (*all_songs)[i]->artist
-            << " - " << (*all_songs)[i]->title
-            << "<br />" << endl;
+        out << replace_body ((*all_songs)[i]->artist, (*all_songs)[i]->title) << endl;
       }
       else
-        out << i << ". " << (*all_songs)[i]->title << "<br />" << endl;
+      {
+        if ((*all_songs)[i]->artist != "")
+        {
+          out << i+1 << ". "
+              << (*all_songs)[i]->artist
+              << " - " << (*all_songs)[i]->title
+              << "<br />" << endl;
+        }
+        else
+          out << i << ". " << (*all_songs)[i]->title << "<br />" << endl;
+      }
     }
 
-    /* Snicker, snicker! */
-    if (all_songs->size() == 0)
-      out << noMusicQuote;
+    /* Footer output. Treated as a header for processing purposes. */
+    if (template_footer.is_set())
+      out << replace_header (template_footer.get(), all_songs->size(), target);
+    else
+      out << "</p>" << endl;
 
-    out << HTMLfooter;
+    out << "</body>\n</html>" << endl;
 
     /* Flush the file and close it */
     out.close();

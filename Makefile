@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -g -W -Wall -O0 $(INCLUDES) $(DEFS)
+CXXFLAGS = -g3 -W -Wall -O0 $(INCLUDES) $(DEFS)
 DEFS = -DNDEBUG
 
 SRCS_C = lex.yy.c y.tab.c
-SRCS_CXX = tagreport.cc templates.cc
+SRCS_CXX = tagreport.cc templates.cc util.cc
 OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 
 INCLUDES = -I/usr/local/include/taglib

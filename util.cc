@@ -1,5 +1,8 @@
 /* Utility functions for use with TagReport. */
 
+#include <ctime>
+#include <cstring>
+
 /* Allocates stuff on the heap - free it! */
 char* get_time_string (void)
 {

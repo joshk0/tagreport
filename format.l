@@ -45,10 +45,12 @@ COMMENT		^#.*
 
 "="		{ return '='; }
 "title"		{ return TYPE_TITLE; }
+"headbody"	{ return TYPE_HEAD_BODY; }
 "header"	{ return TYPE_HEADER; }
 "stats"		{ return TYPE_STATS; }
 "prebody"	{ return TYPE_PREBODY; }
 "footer"	{ return TYPE_FOOTER; }
 "body"		{ return TYPE_BODY; }
+"bodytag"	{ return TYPE_BODY_TAG; }
 
 %%

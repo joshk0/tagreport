@@ -22,6 +22,7 @@ extern char *yytext;
 }
 
 %token   TYPE_TITLE TYPE_HEADER TYPE_STATS TYPE_PREBODY TYPE_FOOTER TYPE_BODY
+%token   TYPE_BODY_TAG TYPE_HEAD_BODY
 %token   <s> TYPE_VALUE
 
 %type	<kt> KeyType
@@ -72,6 +73,27 @@ KeyPair: KeyType '=' TYPE_VALUE {
       template_body.set ($3);
       break;
 
+    case TYPE_BODY_TAG:
+      if (template_body_tag.is_set())
+        WARN_SHADOW("body tag");
+
+      template_body_tag.set ($3);
+      break;
+
+    case TYPE_HEAD_BODY:
+      if (template_head_body.is_set())
+        WARN_SHADOW("<HEAD> tag contents");
+
+      template_head_body.set ($3);
+      break;
+
+    case TYPE_FOOTER:
+      if (template_footer.is_set())
+        WARN_SHADOW("footer");
+
+      template_footer.set ($3);
+      break;
+
     default: /* should NEVER ever ever happen */
       cout << "FATAL: received unexpected " << $1 << " in switch" << endl; 
       abort();
@@ -79,11 +101,13 @@ KeyPair: KeyType '=' TYPE_VALUE {
 }
 
 KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
+	| TYPE_HEAD_BODY { $$ = TYPE_HEAD_BODY; }
 	| TYPE_HEADER	{ $$ = TYPE_HEADER; }
 	| TYPE_STATS	{ $$ = TYPE_STATS; }
 	| TYPE_PREBODY	{ $$ = TYPE_PREBODY; }
 	| TYPE_FOOTER   { $$ = TYPE_FOOTER; }
 	| TYPE_BODY	{ $$ = TYPE_BODY; }
+	| TYPE_BODY_TAG { $$ = TYPE_BODY_TAG; }
 	;
 
 %%
