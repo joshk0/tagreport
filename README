@@ -7,9 +7,9 @@ Winamp for Windows had a neat feature where it could output its playlist to
 a HTML file. TagReport came to be simply because xmms, the UNIX world's Winamp, 
 does not have this kind of capability.
 
-TagReport handles scanning an entire directory hierarchy, but currently can
-only handle reading MP3s and Ogg Vorbis audio files, unlike xmms which can
-be made to read everything under the sun with the right plugins.
+TagReport handles scanning multiple entire directory hierarchies, but
+currently can only handle reading MP3s and Ogg Vorbis audio files, unlike
+xmms which can be made to read everything under the sun with the right plugins.
 
 It also has support for customizable HTML templates. For more information
 on this simple file format look at def/sample.def.
