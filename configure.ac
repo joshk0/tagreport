@@ -54,15 +54,24 @@ if test -z "$TAGLIB_ROOT"; then
   AC_MSG_RESULT([not found])
 else
   AC_MSG_RESULT($TAGLIB_ROOT)
+  AC_SUBST(TAGLIB_ROOT)
+
+  save_CXXFLAGS="$CXXFLAGS"
+  save_CPPFLAGS="$CPPFLAGS"
+
+  CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
+  CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include"
+
+  AC_CHECK_HEADERS([fileref.h tag.h],
+  [
+    AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
+    AC_SUBST(TAGLIB, [-ltag])
+    use_TAGLIB=1
+  ])
+
+  CXXFLAGS="$save_CXXFLAGS -I/usr/local/include -L/usr/local/lib"
+  CPPFLAGS="$save_CPPFLAGS -I/usr/local/include"
 fi
-
-AC_SUBST(TAGLIB_ROOT)
-
-save_CXXFLAGS="$CXXFLAGS"
-save_CPPFLAGS="$CPPFLAGS"
-
-CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
-CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib -I/usr/local/include -L/usr/local/lib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
 
@@ -117,14 +126,6 @@ fi
 AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
-
-AC_CHECK_HEADERS([fileref.h tag.h],
-[
-  AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
-  AC_SUBST(TAGLIB, [-ltag])
-  use_TAGLIB=1
-])
-
 
 if test $use_OGG -eq 1; then
   yes_OGG="yes"
