@@ -1,0 +1,44 @@
+TagReport installation
+----------------------
+
+1. Prerequisites
+
+* GNU make ('make' on a Linux system, 'gmake' on others)
+* GNU g++, or any other ISO C++ compiler, probably works..
+* Some kind of getopt implementation.
+* TagLib. Please retrieve the source from:
+
+    http://ktown.kde.org/~wheeler/taglib/taglib-cvs.tar.gz
+
+  There has not been a formal release yet. It's highly alpha code, and
+  even does not build on Solaris. So watch out!
+
+2. Method
+
+If you installed TagLib in one of these directories:
+
+	/opt /usr/local /usr
+	
+run ./configure without arguments.
+
+If not, invoke run ./configure --with-taglib-prefix= and what you passed
+as --prefix to the TagLib configure script. For example, if for TagLib you
+configured it with --prefix=/usr/opt, then for TagReport run ./configure
+--with-taglib-prefix=/usr/opt. Of course you may also specify a special
+prefix for TagReport with --prefix. See ./configure --help for more info.
+
+When configure has finished run make, and if necessary become the superuser,
+and run make install.
+
+3. Problems
+
+If again you installed TagLib into a special place, and you get something like
+this:
+
+$ ./tagreport
+/usr/libexec/ld-elf.so.1: Shared object "libtag.so.0" not found
+
+You must either add that place to /etc/ld.so.conf or set the environment
+variable LD_LIBRARY_PATH to that path. For example:
+
+$ LD_LIBRARY_PATH=$HOME/usr/lib ./tagreport 
