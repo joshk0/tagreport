@@ -29,6 +29,8 @@ for dir in $userpath /usr /usr/local /opt; do
 	fi
 done
 
+datadir="$datadir/tagreport"
+
 if test -z "$TAGLIB_ROOT"; then
 	AC_MSG_RESULT([not found])
 	AC_MSG_ERROR([Could not find TagLib headers. Try using --with-taglib-prefix?])

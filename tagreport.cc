@@ -104,17 +104,48 @@ int main (int argc, char* argv [])
         break;
 
       case 't':
+      {
+        char* ext;
+
+	/* If it has no extension, a blank extension, or it has an extension
+	 * that is not 'def'. */
+	if (*optarg != '/' && ((ext = strrchr(optarg, '.')) == NULL ||
+              ((optarg[strlen(optarg) - 1] != *ext) && strcmp(ext+1, "def"))))
+	{
+          ostringstream s;
+	  struct stat ex;
+	  s << "def/" << optarg << ".def";
+
+	  if (stat (s.str().c_str(), &ex) == 0)
+            optarg = strdup(s.str().c_str());
+          else
+	  {
+	    ostringstream t;
+	    t << DATADIR << s.str();
+	    
+            if (stat(t.str().c_str(), &ex) == 0)
+              optarg = strdup(t.str().c_str());
+	    else
+              optarg = strdup(optarg);
+	  } 
+	}
+	else
+          optarg = strdup(optarg);
+		
         if ((template_file = fopen (optarg, "r")) == NULL)
-       {
+        {
           cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
+          free(optarg);
           return 1;
-       }
-       else
-       {
+        }
+        else
+        {
           yyparse();
           fclose (template_file);
-       }
-       break;
+          free(optarg);
+        }
+        break;
+      }
         
       case '?': /* Erroneous option was passed! */
         return 1;

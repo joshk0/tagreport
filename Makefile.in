@@ -3,7 +3,7 @@ LEX = @LEX@
 YACC = @YACC@
 INSTALL = @INSTALL@
 TAGLIB_ROOT = @TAGLIB_ROOT@
-DEFS = -DNDEBUG
+DEFS = -DNDEBUG -DDATADIR=\"$(datadir)/\"
 
 CXXFLAGS = @CXXFLAGS@ $(INCLUDES) $(DEFS)
 INCLUDES = -I$(TAGLIB_ROOT)/include/taglib
@@ -57,18 +57,18 @@ distclean: clean
 install: tagreport
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) -m 755 tagreport $(bindir)
-	$(INSTALL) -d $(datadir)/tagreport
+	$(INSTALL) -d $(datadir)/def
 	
 	@for file in $(wildcard def/*.def); do \
-	  echo $(INSTALL) -m 644 $$file $(datadir)/tagreport; \
-	  $(INSTALL) -m 644 $$file $(datadir)/tagreport; \
+	  echo $(INSTALL) -m 644 $$file $(datadir)/def; \
+	  $(INSTALL) -m 644 $$file $(datadir)/def; \
 	done
 
 uninstall:
 	rm -f $(bindir)/tagreport
 	@for file in $(wildcard def/*.def); do \
-	  echo rm -f $(datadir)/tagreport/$$file; \
-	  rm -f $(datadir)/tagreport/$$file; \
+	  echo rm -f $(datadir)/def/$$file; \
+	  rm -f $(datadir)/def/$$file; \
 	done
 
 dist: distclean
