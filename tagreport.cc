@@ -12,6 +12,8 @@
 #include <taglib/tag.h>
 #include <taglib/id3v2tag.h>
 
+#include <cassert>
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +30,7 @@ static char* invoked_as;
 
 int main (int argc, char* argv [])
 {
+  struct stat id;
   invoked_as = argv[0];
   
   if (argc < 2) {
@@ -35,7 +38,13 @@ int main (int argc, char* argv [])
     exit(1);
   }
   else {
-    traverse_dir(argv[1]);
+    stat (argv[1], &id);
+    if (id.st_mode & S_IFDIR)
+      traverse_dir(argv[1]);
+    else {
+      fprintf (stderr, "%s: %s: not a directory!\n", argv[0], argv[1]);
+      return 1;
+    }
   }
   
   return 0;
@@ -65,6 +74,7 @@ void traverse_dir (char* begin)
 #ifdef DEBUG
         fprintf(stderr, "DEBUG: Not recursing into dot-dir '%s'\n", contents->d_name);
 #endif
+	free(fullpath);
         continue;
       }
 
@@ -85,6 +95,7 @@ void traverse_dir (char* begin)
 #ifdef DEBUG
 	  fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
 #endif
+	  free(fullpath);
           continue;
 	}
 	
@@ -92,6 +103,10 @@ void traverse_dir (char* begin)
         if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
 	    || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3")) {
           TagLib::FileRef ref (fullpath);
+
+	  if(ref.isNull())
+	    abort();
+
   	  tag = ref.tag();
 #ifdef DEBUG
           printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());

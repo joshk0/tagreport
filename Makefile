@@ -1,6 +1,6 @@
 CC = gcc
 CXX = g++
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -O0
 CXXFLAGS = $(CFLAGS)
 
 all: tagreport maildirtree
