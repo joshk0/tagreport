@@ -27,7 +27,7 @@ done
 
 if test -z "$TAGLIB_ROOT"; then
 	AC_MSG_RESULT([not found])
-	AC_MSG_ERROR([Could not find TagLib headers.])
+	AC_MSG_ERROR([Could not find TagLib headers. Try using --with-taglib-prefix?])
 else
 	AC_MSG_RESULT($TAGLIB_ROOT)
 fi
