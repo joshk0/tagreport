@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -g -W -Wall -O0
 
-all: maildirtree
+all: tagreport
 
 tagreport: tagreport.cc
 	$(CXX) $(CXXFLAGS) -I/usr/local/include/taglib $< -o $@ -ltag
