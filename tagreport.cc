@@ -47,10 +47,6 @@
 
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
-#else
-# ifdef HAVE_LIB_GETOPT_H
-#  include "lib/getopt.h"
-# endif
 #endif
 
 using namespace std;
@@ -379,7 +375,7 @@ vector<struct Song*>* traverse_dir (char* begin)
 #ifdef HAVE_METAFLAC
 	if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
         {
-          tmpsong = metaflac(fp.str().c_str());
+          metaflac(tmpsong, fp.str().c_str());
 
 	  if (tmpsong->title == "" || tmpsong->artist == "")
             delete tmpsong; /* Just ignore it. */

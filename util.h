@@ -13,7 +13,7 @@ void htmlify (string &);
 void verify (std::vector<char*> & targets);
 
 #ifdef HAVE_METAFLAC
-struct Song * metaflac (const char* path);
+bool metaflac (struct Song* flac, const char* path);
 #endif
 
 #endif

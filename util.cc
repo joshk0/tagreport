@@ -156,13 +156,12 @@ void verify (vector<char*> & targets)
 #ifdef HAVE_METAFLAC
 /* Fork metaflac for a file with path path and get its artist and title
  * comment fields. */
-struct Song * metaflac (const char* path)
+bool metaflac (struct Song* flac, const char* path)
 {
   FILE* mf;
   ostringstream cmd;
   char buf[1024];
   unsigned int i;
-  struct Song *flac = new struct Song;
   string fn = path;
   
   /* Ewwwww! Sick! */
@@ -180,11 +179,14 @@ struct Song * metaflac (const char* path)
     else if (h.find("TITLE=") == 0)
       flac->title = h.substr(6, h.length() - 7);
     else
+    {
       DEBUG("read failed, buf is", h);
+      return false;
+    }
   }
 
   pclose(mf);
   
-  return flac;
+  return true;
 }
 #endif
