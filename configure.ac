@@ -15,7 +15,7 @@ AC_PROG_INSTALL
 
 AC_ARG_WITH(taglib-prefix,
 AC_HELP_STRING([--with-taglib-prefix=PATH], [Add another path to the search path for TagLib's headers.]),
-[$userpath="$withval"], [])
+[userpath="$withval"], [])
 
 AC_MSG_CHECKING([for location of TagLib includes])
 for dir in $userpath /usr /usr/local /opt; do
