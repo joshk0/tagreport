@@ -187,4 +187,4 @@ AC_CONFIG_FILES(Makefile)
 AC_OUTPUT
 
 echo
-echo "Type 'make' to begin the build."
+echo "Type make (or gmake) to begin the build."
