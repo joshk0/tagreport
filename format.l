@@ -16,7 +16,7 @@ using namespace std;
 #include "tagreport.h"
 
 unsigned int line = 1, col = 0;
-unsigned int comment_begin_line;
+unsigned int comment_begin_line, comment_begin_col;
 
 static void ccomment(void);
 
@@ -41,7 +41,7 @@ LONGCOMMENT	"/*"
 
 {MALSTRING} {
   /* yytext already contains a newline, no need for one here */
-  cerr << "Error: unterminated string constant in template at line " << line << ": " << yytext;
+  cerr << "Error: unterminated string constant in template at line " << line << " (started at column " << col - yyleng + 1 << "): " << yytext;
 
   if (!force)
     exit(1);
@@ -49,7 +49,11 @@ LONGCOMMENT	"/*"
 
 {WHITE}		{ }
 {COMMENT}	{ }
-{LONGCOMMENT}	{ comment_begin_line = line; ccomment(); }
+{LONGCOMMENT}	{
+  comment_begin_line = line;
+  comment_begin_col = col - 1;
+  ccomment();
+}
 
 "="		{ return '='; }
 "title"		{ return TYPE_TITLE; }
@@ -64,14 +68,10 @@ LONGCOMMENT	"/*"
 \n		{ line++; col = 0; }
 
 . {
-  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template at line " << line;
-  if (!force)
-  {
-    cerr << ", bailing out!" << endl;
+  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template at line " << line << " column " << col;
+
+ if (!force)
     exit(1);
-  }
-  else
-    cerr << ", continuing." << endl;
 }
 
 %%
@@ -102,7 +102,7 @@ void ccomment(void)
     }
     if (c == EOF)
     {
-      cerr << "Error: encountered end-of-file in comment starting on line " << comment_begin_line << endl;
+      cerr << "Error: encountered end-of-file in comment starting on line " << comment_begin_line << ", column " << comment_begin_col << endl;
 
       if (force)
         return;
