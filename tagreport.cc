@@ -101,6 +101,12 @@ int main (int argc, char* argv [])
        return 0;
 
       case 'o':
+        if (outfile)
+        {
+          cerr << "Warning: " << outfile << " will no longer be written to in favor of " << optarg << "." << endl;
+          free(outfile);
+	}
+
         outfile = strdup(optarg);
         break;
         
