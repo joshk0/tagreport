@@ -67,9 +67,10 @@ install: tagreport
 uninstall:
 	rm -f $(bindir)/tagreport
 	@for file in $(wildcard def/*.def); do \
-	  echo rm -f $(datadir)/def/$$file; \
-	  rm -f $(datadir)/def/$$file; \
+	  echo rm -f $(datadir)/$$file; \
+	  rm -f $(datadir)/$$file; \
 	done
+	-rmdir $(datadir)/def && rmdir $(datadir)
 
 dist: distclean
 	autoheader
