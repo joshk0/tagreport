@@ -395,7 +395,6 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     {
       song->title = NOPATHEXT(fn, begin);
       htmlify(song->title);
-      return true;
     }
     
     return true;
@@ -412,7 +411,6 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     {
       song->title = NOPATHEXT(fn, begin);
       htmlify(song->title);
-      return true;
     }
 
     return true;
