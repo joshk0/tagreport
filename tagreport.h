@@ -39,5 +39,6 @@ Syntax: tagreport [-h] [-v] [-t template] [-o output] directory\n"
 
 /* Global settings */
 extern bool verbose, force;
+extern char* template_fn;
 
 #endif

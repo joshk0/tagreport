@@ -65,13 +65,15 @@ bool verbose = true;
 
 bool force = false;
 
+char* template_fn = NULL;
+
 int main (int argc, char* argv [])
 {
   bool already_template = false;
   struct stat id;
   vector <struct Song*>* all_songs = NULL;
   ostringstream tmpout;
-  char *target = NULL, *outfile = NULL, *template_fn = NULL;
+  char *target = NULL, *outfile = NULL;
   int opt;
   unsigned int i;
   ofstream out;

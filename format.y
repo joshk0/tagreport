@@ -19,6 +19,7 @@ using namespace std;
 extern int yylex(void);
 extern void yyerror(const char*);
 extern char *yytext;
+extern unsigned int line, col;
 
 %}
 
@@ -35,7 +36,7 @@ extern char *yytext;
 %%
 
 Template: KeyPairs
-	| { cerr << "Error: template file has no settings, continuing with defaults." << endl << "This is probably not what you want!" << endl; }
+	| { cerr << "Error: " << template_fn << " has no settings, continuing with defaults." << endl << "This is probably not what you want!" << endl; }
 	;
 
 KeyPairs: KeyPairs KeyPair
@@ -99,13 +100,8 @@ KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 
 void yyerror(char const* s)
 {
-  cerr << "Couldn't parse \"" << yytext << "\": " << s;
-  
-  if (force)
-    cerr << ", continuing." << endl;
-  else
-  {
-    cerr << ", aborting!" << endl;
+  cerr << "Couldn't parse \"" << yytext << "\" at line " << line << " column " << col << endl;
+
+  if (!force)
     exit(1);
-  }
 }

@@ -41,7 +41,7 @@ LONGCOMMENT	"/*"
 
 {MALSTRING} {
   /* yytext already contains a newline, no need for one here */
-  cerr << "Error: unterminated string constant in template at line " << line << " (started at column " << col - yyleng + 1 << "): " << yytext;
+  cerr << "Error: unterminated string constant in " << template_fn << " at line " << line << " (started at column " << col - yyleng + 1 << "): " << yytext;
 
   if (!force)
     exit(1);
@@ -68,7 +68,7 @@ LONGCOMMENT	"/*"
 \n		{ line++; col = 0; }
 
 . {
-  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in template at line " << line << " column " << col;
+  cerr << "Error: unrecognized token \"" << yytext[0] << "\" in " << template_fn << " at line " << line << " column " << col << endl;
 
  if (!force)
     exit(1);
