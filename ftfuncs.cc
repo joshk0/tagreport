@@ -203,6 +203,7 @@ bool get_ogg (struct Song * ogg, const char * path)
 #endif /* USE_OGG */
 
 #ifdef USE_ID3TAG
+/* Some logic ripped from xmms-mad, thanks :) */
 bool get_mp3 (struct Song *mp3, const char* path)
 {
   bool found_title = false, found_artist = false;
@@ -219,11 +220,11 @@ bool get_mp3 (struct Song *mp3, const char* path)
   if (!(tag = id3_file_tag (m)))
     return false;
   
-  if ((frame = id3_tag_findframe (tag, ID3_FRAME_TITLE, 0)))
+  if ((frame = id3_tag_findframe (tag, ID3_FRAME_TITLE, 0)) != NULL)
   {
-    if ((field = id3_frame_field (frame, 1)))
+    if ((field = id3_frame_field (frame, 1)) != NULL)
     {
-      if ((str = id3_field_getstrings (field, 0)))
+      if ((str = id3_field_getstrings (field, 0)) != NULL)
       {
         mp3->title = (const char*) id3_ucs4_latin1duplicate(str);
         htmlify(mp3->title);
@@ -232,11 +233,11 @@ bool get_mp3 (struct Song *mp3, const char* path)
     }
   }
 
-  if ((frame = id3_tag_findframe (tag, ID3_FRAME_ARTIST, 0)))
+  if ((frame = id3_tag_findframe (tag, ID3_FRAME_ARTIST, 0)) != NULL)
   {
-    if ((field = id3_frame_field (frame, 1)))
+    if ((field = id3_frame_field (frame, 1)) != NULL)
     {
-      if ((str = id3_field_getstrings (field, 0)))
+      if ((str = id3_field_getstrings (field, 0)) != NULL)
       {
         mp3->artist = (const char*) id3_ucs4_latin1duplicate(str);
         htmlify(mp3->artist);
@@ -253,6 +254,8 @@ bool get_mp3 (struct Song *mp3, const char* path)
 bool get_artist_title (struct Song * song, string fn, char * begin)
 {
   string ext = fn;
+  string::iterator e;
+  bool (*getfunc)(struct Song*, const char*);
   
   /* Skip filenames with no extension */
   if (fn.rfind('.') == string::npos)
@@ -268,9 +271,6 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     return false;
   }
   
-  /* Valid extension */
-  string::iterator e;
-  
   /* Grab the first four letters of the extension (if possible)
    * and store it in ext as lowercase. */
   ext = ext.substr(ext.rfind('.') + 1, 4);
@@ -279,7 +279,6 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     *e = tolower(*e);
 
   /* Choose which function to use. */
-  bool (*getfunc)(struct Song*, const char*);
 
 #ifdef USE_FLAC
   if (ext == "flac")
@@ -302,20 +301,22 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     goto skipextcheck;
   }
 #endif
-#if !defined(USE_ID3TAG) && defined(USE_TAGLIB)
+#ifdef USE_TAGLIB
+#ifndef USE_ID3TAG
   if (ext == "mp3")
   {
     getfunc = &get_taglib;
     goto skipextcheck;
   }
-#endif
-#if !defined(USE_OGG) && defined(USE_TAGLIB)
+#endif /* !USE_ID3TAG */
+#ifndef USE_OGG
   if (ext == "ogg")
   {
     getfunc = &get_taglib;
     goto skipextcheck;
   }
-#endif
+#endif /* !USE_OGG */
+#endif /* USE_TAGLIB */
   else
   {
      DEBUG ("skipping unrecognized file", fn);
