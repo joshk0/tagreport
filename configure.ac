@@ -2,6 +2,8 @@ AC_INIT(TagReport, [0.01a])
 
 AC_CONFIG_HEADER([config.h])
 
+dnl Variable initialization
+no_getopt_long=0
 use_FLAC=0
 use_OGG=0
 use_ID3=0
@@ -12,7 +14,7 @@ AC_PROG_CXX
 AC_LANG(C++)
 
 if test "$ac_cv_cxx_compiler_gnu" = yes; then
-  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused $INCLUDES"
+  CXXFLAGS="$CXXFLAGS -Wall -W $INCLUDES"
 fi
 
 LEX_LANG=CXX
@@ -100,7 +102,14 @@ AC_CHECK_HEADER(id3tag.h,
   ])
 ])
 
-AC_SEARCH_LIBS(getopt_long, gnugetopt)
+AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1])
+
+dnl We do this outside the command to allow SEARCH_LIBS to do its $LIBS
+dnl thing
+if test $no_getopt_long -eq 0; then
+  AC_DEFINE(HAVE_GETOPT_LONG, 1, [The getopt_long function is available.])
+fi
+
 AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
