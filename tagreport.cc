@@ -40,24 +40,38 @@ void traverse_dir (char* begin)
   /* XXX NOT DONE XXX */
   DIR* root;
   struct dirent * contents;
+  char *comp, *fullpath = NULL;
   
   if ((root = opendir(begin)) != NULL) {
     /* DURRRRRRRRRRRRRRRRRRR  not done yet */
-    while ((contents = readdir(root)) != NULL) {
+    while ((contents = readdir(root)) != NULL)
+    {
+
+      asprintf(&fullpath, "%s/%s", begin, contents->d_name);
+      
       if (contents->d_type == DT_DIR) {
         traverse_dir(contents->d_name);
       }
-      else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
-        TagLib::VorbisFile current_ogg (TagLib::String(contents->d_name));
-      }
-      else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
-        TagLib::MPEGFile current_mp3 (TagLib::String(contents->d_name));
-      }
-#ifdef DEBUG
+
       else {
-        fprintf(stderr, "DEBUG: Skipping file %s\n", contents->d_name);
-      }
+        /* Skip filenames with no extension */
+        if ((comp = strrchr(contents->d_name, '.')) == NULL)
+          continue;
+	
+        if (!strcasecmp(strrchr(contents->d_name, '.')+1, "ogg")) {
+          TagLib::VorbisFile current_ogg (TagLib::String(fullpath));
+        }
+        else if (!strcasecmp(strrchr(contents->d_name, '.')+1, "mp3")) {
+          TagLib::MPEGFile current_mp3 (TagLib::String(fullpath));
+	}
+#ifdef DEBUG
+        else {
+          fprintf(stderr, "DEBUG: Skipping file %s\n", contents->d_name);
+        }
 #endif
+      }
+
+      free (fullpath);
     }
   }
   else {
