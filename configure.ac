@@ -68,7 +68,7 @@ else
     AC_CHECK_HEADER(fileref.h,
     [
       AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
-      AC_SUBST(TAGLIB, [-ltag])
+      LIBS="$LIBS -ltag"
       TAGLIB_INCLUDE="-I\$(TAGLIB_ROOT)/include/taglib"
       TAGLIB_LD="-L\$(TAGLIB_ROOT)/lib"
       use_TAGLIB=1
@@ -86,7 +86,7 @@ AC_CHECK_HEADER([FLAC/metadata.h],
   AC_CHECK_LIB([FLAC], FLAC__metadata_simple_iterator_new,
   [
     AC_DEFINE(USE_FLAC, 1, [FLAC support works. Don't change!])
-    AC_SUBST(FLACLIB, -lFLAC)
+    LIBS="$LIBS -lFLAC"
     use_FLAC=1
   ])
 ])
@@ -100,7 +100,7 @@ AC_CHECK_HEADER(vorbis/codec.h,
       AC_DEFINE(USE_OGG, 1, [Ogg Vorbis support works.])
       dnl Really, it's the user's problem if they have libvorbisfile
       dnl and not libvorbis and libogg too.
-      AC_SUBST(OGGLIB, ["-lvorbisfile -lvorbis -logg"])
+      LIBS="$LIBS -lvorbisfile -lvorbis -logg"
       use_OGG=1
     ], , [-lvorbis -logg])
   ]) 
@@ -114,7 +114,7 @@ AC_CHECK_HEADER(id3tag.h,
     AC_CHECK_LIB(id3tag, id3_frame_field,
     [
       AC_DEFINE(USE_ID3TAG, 1, [MAD ID3tag support works.])
-      AC_SUBST(ID3TAGLIB, ["-lid3tag -lz"])
+      LIBS="$LIBS -lid3tag -lz"
       use_ID3=1
     ], , [-lz])
   ], , [-lz])
