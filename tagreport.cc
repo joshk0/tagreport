@@ -55,7 +55,7 @@ static string HTMLheader =
 <h2>Playlist of ";
 
 static string HTMLfooter =
-"</p></body>\n\
+"</p><hr /></body>\n\
 </html>";
 
 static vector<struct Song*>* traverse_dir (char* begin);
@@ -80,6 +80,11 @@ int main (int argc, char* argv [])
     time_t now_secs;
     char now_date[18];
 
+    /* Get the current time */
+    time(&now_secs);
+    now = localtime(&now_secs);
+    strftime (now_date, 18, "%H:%M, %F", now);
+    
     while ((opt = getopt(argc, argv, "o:")) != -1)
     {
       switch(opt)
@@ -106,16 +111,13 @@ int main (int argc, char* argv [])
       cerr << "Failed to open file " << target << ": " << strerror(errno) << endl;
       return 1;
     }
-
-    /* Get the current time */
-    time(&now_secs);
-    now = localtime(&now_secs);
-    strftime (now_date, 18, "%H:%M, %F", now);
     
     /* Write out canned headers */
     out << HTMLdtd << HTMLheader;
     
+    cout << "Scanning ";
     all_songs = traverse_dir(target);
+    cout << endl;
     
     out << target << "</h2><hr />" << endl;
     out << "<p>Generated at " << now_date << "<br />" << endl;
@@ -154,6 +156,7 @@ int main (int argc, char* argv [])
   }
 
   free(target);
+  free(outfile);
   
   return 0;
 }
@@ -173,11 +176,13 @@ vector<struct Song*>* traverse_dir (char* begin)
   
   if ((root = opendir(begin)) != NULL)
   {
+    cout << "..";
+    fflush(stdout);
     while ((contents = readdir(root)) != NULL)
     {
       string fn = contents->d_name;
       ostringstream fp;
-     
+
       /* Skip .. and . */
       if (fn == "." || fn == "..")
         continue;
@@ -231,7 +236,10 @@ vector<struct Song*>* traverse_dir (char* begin)
           TagLib::FileRef ref (fp.str().c_str());
 
           if(ref.isNull())
-            abort();
+	  {
+            cout << *(char*)0 << endl;
+	    exit(1);
+	  }
 
           tag = ref.tag();
         
@@ -300,7 +308,8 @@ printfn:
     }
   }
   /* If we get here there was SOME sort of error with opendir() */
-  else {
+  else
+  {
     cerr << invoked_as << ": Error reading directory: " << strerror(errno) << endl;
     exit(1);
   }
