@@ -21,22 +21,28 @@
 #include <fileref.h>
 #include <tag.h>
 
+/* STL includes */
 #include <vector>
-#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+/* C/C++ hybrids. */
+#include <cassert>
+#include <cctype>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+/* C system headers */
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <time.h>
 
 using namespace std;
 
@@ -128,10 +134,10 @@ int main (int argc, char* argv [])
     {
       if ((*all_songs)[i]->artist != "")
       {
-        out  << i+1 << ". "
-             << (*all_songs)[i]->artist
-             << " - " << (*all_songs)[i]->title
-             << "<br />" << endl;
+        out << i+1 << ". "
+            << (*all_songs)[i]->artist
+            << " - " << (*all_songs)[i]->title
+            << "<br />" << endl;
       }
       else
         out << i << ". " << (*all_songs)[i]->title << "<br />" << endl;
@@ -182,6 +188,7 @@ vector<struct Song*>* traverse_dir (char* begin)
   {
     cout << "..";
     fflush(stdout);
+
     while ((contents = readdir(root)) != NULL)
     {
       string fn = contents->d_name;
@@ -196,7 +203,7 @@ vector<struct Song*>* traverse_dir (char* begin)
       /* Recurse if this entry is actually a directory */
       stat (fp.str().c_str(), &dino);
       
-      if (dino.st_mode & S_IFDIR)
+      if (S_ISDIR(dino.st_mode))
       {
         vector<struct Song*>* recursion;
         
@@ -213,8 +220,17 @@ vector<struct Song*>* traverse_dir (char* begin)
       {
         /* will be used in all cases */
         struct Song * tmpsong = new struct Song;
+	string ext = fn;
+	string::iterator e;
         
-        /* Skip filenames with no extension */
+	/* Grab the first three letters of the extension (if possible)
+	 * and store it in ext as lowercase. */
+        ext = ext.substr(ext.rfind('.') + 1, 3);
+
+	for (e = ext.begin(); e != ext.end(); e++)
+          *e = tolower(*e);
+		
+	/* Skip filenames with no extension */
         if (fn.find('.') == string::npos)
         {
 #ifndef NDEBUG
@@ -232,10 +248,9 @@ vector<struct Song*>* traverse_dir (char* begin)
           delete tmpsong;
           continue;
         }
-
+	
         /* Ogg Vorbis or MP3 file? */
-        else if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
-            || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3"))
+        else if (ext == "ogg" || ext == "mp3")
         {
           TagLib::FileRef ref (fp.str().c_str());
 
@@ -355,6 +370,7 @@ static void htmlify (string & in)
   while (true)
   {
     unsigned int spacepos;
+    
     if ((spacepos = in.find("  ")) != string::npos)
       in.replace(spacepos, 2, "&nbsp;&nbsp;");
     else
