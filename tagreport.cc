@@ -50,9 +50,6 @@ static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
 static void htmlify (string &);
 
-/* Stores argv[0] */
-char* invoked_as;
-
 int main (int argc, char* argv [])
 {
   struct stat id;
@@ -61,8 +58,6 @@ int main (int argc, char* argv [])
   char *target = NULL, *outfile = NULL;
   int opt;
   
-  invoked_as = argv[0];
-
   /* read all options - for now only -o */
   while ((opt = getopt(argc, argv, "o:")) != -1)
   {
@@ -168,7 +163,7 @@ int main (int argc, char* argv [])
   /* !S_ISDIR(dino.st_mode) */
   else
   {
-    cerr << argv[0] << ": " << target << ": not a directory!" << endl;
+    cerr << "Error opening " << target << ": not a directory!" << endl;
     return 1;
   }
  
@@ -345,7 +340,7 @@ printfn:
   else
   {
     cout << endl;
-    cerr << invoked_as << ": Error reading directory: " << strerror(errno) << endl;
+    cerr << "Error reading directory " << begin << ": " << strerror(errno) << endl;
     exit(1);
   }
 
