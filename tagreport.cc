@@ -59,7 +59,7 @@ void traverse_dir (char* begin)
       asprintf(&fullpath, "%s/%s", begin, contents->d_name);
       
       if (contents->d_type == DT_DIR) {
-        traverse_dir(contents->d_name);
+        traverse_dir(fullpath);
       }
 
       else {
