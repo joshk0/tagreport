@@ -50,6 +50,12 @@ static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
 static void htmlify (string &);
 
+#ifdef NDEBUG
+bool verbose = false;
+#else
+bool verbose = true;
+#endif
+
 int main (int argc, char* argv [])
 {
   struct stat id;
@@ -59,14 +65,18 @@ int main (int argc, char* argv [])
   int opt;
   
   /* read all options - for now only -o */
-  while ((opt = getopt(argc, argv, "o:")) != -1)
+  while ((opt = getopt(argc, argv, "o:v")) != -1)
   {
     switch(opt)
     {
       case 'o':
         outfile = strdup(optarg);
         break;
-	
+        
+      case 'v':
+        verbose = true;
+        break;
+        
       case '?':
         return 1;
     }
@@ -75,7 +85,7 @@ int main (int argc, char* argv [])
   if (optind < argc)
     target = strdup(argv[optind]);
   else
-    target = strdup(getenv("PWD"));
+    target = strdup(getcwd());
     
   stat (target, &id);
   
@@ -109,9 +119,13 @@ int main (int argc, char* argv [])
     /* Write out canned headers */
     out << HTMLdtd << HTMLheader;
     
-    cout << "Scanning ";
+    if (verbose)
+      cout << "Scanning ";
+    
     all_songs = traverse_dir(target);
-    cout << endl;
+
+    if (verbose)
+      cout << endl;
     
     /* Some statistics ... */
     out << target << "</h2><hr />" << endl;
@@ -154,11 +168,13 @@ int main (int argc, char* argv [])
       /* We can't create outfile. */
       outfile = (char*)tmpout.str().c_str();
     }
+   
+    cout << "Wrote " << outfile;
     
     if (all_songs->size() != 0)
-      cout << "Wrote " << outfile << " (" << all_songs->size() << " songs) successfully." << endl;
+      cout << " (" << all_songs->size() << " songs) successfully." << endl;
     else
-      cout << "Wrote " << outfile << ", but found no valid songs!" << endl;
+      cout << ", but found no valid songs!" << endl;
   }
   /* !S_ISDIR(dino.st_mode) */
   else
@@ -196,8 +212,11 @@ vector<struct Song*>* traverse_dir (char* begin)
   
   if ((root = opendir(begin)) != NULL)
   {
-    cout << "..";
-    fflush(stdout);
+    if (verbose)
+    {
+      cout << "..";
+      fflush(stdout);
+    }
 
     while ((contents = readdir(root)) != NULL)
     {
@@ -219,7 +238,7 @@ vector<struct Song*>* traverse_dir (char* begin)
         
         DEBUG("Recursing into", fp.str());
         
-	recursion = traverse_dir((char*)fp.str().c_str());
+        recursion = traverse_dir((char*)fp.str().c_str());
         all_songs->insert (all_songs->end(), recursion->begin(), recursion->end());
         delete recursion; /* Already copied into all_songs */
       }
@@ -229,52 +248,48 @@ vector<struct Song*>* traverse_dir (char* begin)
       {
         /* will be used in all cases */
         struct Song * tmpsong = new struct Song;
-	string ext = fn;
-		
-	/* Skip filenames with no extension */
+        string ext = fn;
+                
+        /* Skip filenames with no extension */
         if (fn.find('.') == string::npos)
         {
           DEBUG("skipping extensionless file", fn);
           
-	  delete tmpsong;
+          delete tmpsong;
           continue;
         }
 
-	/* Extension is there, but nothing */
+        /* Extension is there, but nothing */
         else if (fn[fn.length() - 1] == '.')
         {
           DEBUG("blank extension for file", fn);
 
-	  delete tmpsong;
+          delete tmpsong;
           continue;
         }
 
-	/* Valid extension */
-	else
-	{
-	  string::iterator e;
+        /* Valid extension */
+        else
+        {
+          string::iterator e;
           /* Grab the first three letters of the extension (if possible)
            * and store it in ext as lowercase. */
           ext = ext.substr(ext.rfind('.') + 1, 3);
         
           for (e = ext.begin(); e != ext.end(); e++)
             *e = tolower(*e);
-	}
+        }
 
         /* Ogg Vorbis or MP3 file? */
         if (ext == "ogg" || ext == "mp3")
         {
           TagLib::FileRef ref (fp.str().c_str());
 
-          if(ref.isNull())
-	  {
-            cout << *(char*)0 << endl;
-	    exit(1);
-	  }
+          assert (!ref.isNull());
 
           tag = ref.tag();
         
-	  /* Do they both have artist and title fields? */
+          /* Do they both have artist and title fields? */
           if (!tag->artist().isNull() && !tag->title().isNull())
           {
             /* Non-null but empty tag */
@@ -282,7 +297,7 @@ vector<struct Song*>* traverse_dir (char* begin)
             {
               tmpsong->artist = "";
               tmpsong->title = fn.substr(0, fn.rfind('.'));
-	      htmlify(tmpsong->title);
+              htmlify(tmpsong->title);
               all_songs->push_back(tmpsong);
             }
             else /* Tag is non-empty */
@@ -297,9 +312,9 @@ vector<struct Song*>* traverse_dir (char* begin)
                 tmpsong->artist = a.to8Bit(false);
                 tmpsong->title = t.to8Bit(false);
 
-		htmlify(tmpsong->artist);
-		htmlify(tmpsong->title);
-		
+                htmlify(tmpsong->artist);
+                htmlify(tmpsong->title);
+                
                 all_songs->push_back(tmpsong);
               }
               else
@@ -317,7 +332,7 @@ printfn:
               tmpsong->artist = "";
               tmpsong->title = noext;
 
-	      htmlify(tmpsong->title);
+              htmlify(tmpsong->title);
               all_songs->push_back(tmpsong);
             }
             else /* This shouldn't happen, right? We checked for it before */
@@ -362,7 +377,7 @@ void clean (vector<struct Song *> * root)
 /* Escapes illegal HTML characters into their long counterparts. */
 static void htmlify (string & in)
 {
-  unsigned int c, i;
+  unsigned int c, i, s;
 
   /* replace each found character in replacechars by respective 
    * entry in replacehtml */
@@ -379,13 +394,6 @@ static void htmlify (string & in)
    * i.e. htmlify("  ") should become " &nbsp;", but it becomes
    * "&nbsp;&nbsp;" */
   
-  while (true)
-  {
-    unsigned int spacepos;
-    
-    if ((spacepos = in.find("  ")) != string::npos)
-      in.replace(spacepos, 2, "&nbsp;&nbsp;");
-    else
-      break;
-  }
+  while ((s = in.find("  ")) != string::npos)
+      in.replace(s, 2, "&nbsp;&nbsp;");
 }
