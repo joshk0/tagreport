@@ -30,6 +30,7 @@ using namespace std;
 %}
 
 VALUE		\".*\"
+MALSTRING	\"[^\"]*\n
 WHITE		[\n\t ]*
 COMMENT		^#.*
 
@@ -42,6 +43,7 @@ COMMENT		^#.*
   return TYPE_VALUE;
 }
 
+{MALSTRING}	{ cerr << "error: unterminated string constant in template: " << yytext; exit(1); }
 {WHITE}		{ }
 {COMMENT}	{ }
 

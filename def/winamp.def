@@ -8,6 +8,6 @@ header = "<div align="center"><div CLASS="para2" align="center"><p>TAGREPORT</p>
 
 stats = "<table border="0" cellspacing="0" cellpadding="0" width="98%"><tr><td><font face="Arial" color="#FFBF00" size="-2">$count</font><font color="#409FFF" face="Arial" size="-2"> tracks in playlist, scanned at $date</font></td></tr></table>"
 
-prebody = "<blockquote><font face="Arial" color="#FFFFFF">"
+prebody = "<p><font color="#FFBF00" face="Arial" size="+1">Playlist files:</font></p><blockquote><font face="Arial" color="#FFFFFF" size="2">"
 
 footer = "</font></blockquote><hr align="left" width="90%" noshade size="1" color="#FFBF00">"
