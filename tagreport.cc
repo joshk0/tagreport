@@ -19,10 +19,7 @@
 #include "html.h"
 #include "templates.h"
 #include "util.h"
-
-/* TagLib includes */
-#include <fileref.h>
-#include <tag.h>
+#include "ftfuncs.h"
 
 /* STL includes */
 #include <vector>
@@ -55,8 +52,7 @@ extern int yyparse (void);
 extern FILE *yyin;
 
 static vector<struct Song*>* traverse_dir (char* begin);
-static void clean (vector<struct Song*>* root);
-static void clean (vector<char*> & dirs);
+static bool get_artist_title (struct Song * song, string fn, char* begin);
 
 #ifdef NDEBUG
 bool verbose = false;
@@ -346,123 +342,11 @@ vector<struct Song*>* traverse_dir (char* begin)
       /* Not a directory, assumed to be a normal file */
       else
       {
-        /* will be used in all cases */
-        struct Song * tmpsong = new struct Song;
-        string ext = fn;
-
-        /* Skip filenames with no extension */
-        if (fn.find('.') == string::npos)
-        {
-          DEBUG("skipping extensionless file", fn);
-          
-          delete tmpsong;
-          continue;
-        }
-
-        /* Extension is there, but nothing */
-        else if (fn[fn.length() - 1] == '.')
-        {
-          DEBUG("blank extension for file", fn);
-
-          delete tmpsong;
-          continue;
-        }
-
-        /* Valid extension */
+        struct Song * this_song = new struct Song;
+        if (get_artist_title (this_song, fp.str(), begin))
+          all_songs->push_back(this_song);
         else
-        {
-          string::iterator e;
-          /* Grab the first four letters of the extension (if possible)
-           * and store it in ext as lowercase. */
-          ext = ext.substr(ext.rfind('.') + 1, 4);
-        
-          for (e = ext.begin(); e != ext.end(); e++)
-            *e = tolower(*e);
-        }
-#ifdef USE_FLAC
-        if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
-        {
-          getflac(tmpsong, fp.str().c_str());
-
-          if (tmpsong->title == "" || tmpsong->artist == "")
-            delete tmpsong; /* Just ignore it. */
-          else
-            all_songs->push_back(tmpsong);
-        }
-        /* Ogg Vorbis or MP3 file? */
-        else if (ext == "ogg" || ext == "mp3")
-#else
-        if (ext == "ogg" || ext == "mp3")
-#endif
-        {
-          TagLib::Tag *tag;
-          TagLib::FileRef ref (fp.str().c_str());
-
-          assert (!ref.isNull());
-
-          if ((tag = ref.tag()) == NULL)
-          {
-            DEBUG("Null tag; corrupt file encountered?", "");
-            continue;
-          }
-        
-          /* Do they both have artist and title fields? */
-          if (!tag->artist().isNull() && !tag->title().isNull())
-          {
-            /* Non-null but empty tag */
-            if (tag->artist().isEmpty() || tag->title().isEmpty()) 
-            {
-              tmpsong->title = fn.substr(0, fn.rfind('.'));
-              htmlify(tmpsong->title);
-              all_songs->push_back(tmpsong);
-            }
-            else /* Tag is non-empty */
-            {
-              TagLib::String a, t;
-              
-              a = tag->artist().stripWhiteSpace();
-              t = tag->title().stripWhiteSpace();
-              
-              if (!a.isEmpty() && !t.isEmpty())
-              {
-                tmpsong->artist = a.to8Bit(false);
-                tmpsong->title = t.to8Bit(false);
-
-                htmlify(tmpsong->artist);
-                htmlify(tmpsong->title);
-                
-                all_songs->push_back(tmpsong);
-              }
-              else
-                goto printfn;
-            }
-          }
-          else /* NO TAG! */
-          {
-            /* strip the extension from a filename without ID */
-printfn:
-            string noext = fn.substr(0, fn.rfind('.'));
-
-            if (noext != "")
-            {
-              tmpsong->title = noext;
-
-              htmlify(tmpsong->title);
-              all_songs->push_back(tmpsong);
-            }
-            else /* This shouldn't happen, right? We checked for it before */
-            {
-              delete tmpsong;
-              continue;
-            }
-          }
-        }
-        /* we did not do anything with this file.. */
-        else
-        {
-          DEBUG ("skipping unrecognized file", fn);
-          delete tmpsong;
-        }
+          delete this_song;
       }
     }
   }
@@ -480,22 +364,66 @@ printfn:
   return all_songs;
 }
 
-/* Simply purges the entries in a vector. */
-void clean (vector<struct Song *> * root)
+bool get_artist_title (struct Song * song, string fn, char * begin)
 {
-  vector<struct Song *>::iterator v;
+  string ext = fn;
+  
+  /* Skip filenames with no extension */
+  if (fn.rfind('.') == string::npos)
+  {
+    DEBUG("skipping extensionless file", fn);
+    return false;  
+  }
 
-  /* All strings are on the stack, we don't need to do anything with them */
-  for (v = root->begin(); v != root->end(); v++)
-    delete *v;
+  /* Extension is there, but nothing */
+  else if (fn[fn.length() - 1] == '.')
+  {
+    DEBUG("blank extension for file", fn);
+    return false;
+  }
 
-  delete root;
-}
+  /* Valid extension */
+  string::iterator e;
+  
+  /* Grab the first four letters of the extension (if possible)
+   * and store it in ext as lowercase. */
+  ext = ext.substr(ext.rfind('.') + 1, 4);
+        
+  for (e = ext.begin(); e != ext.end(); e++)
+    *e = tolower(*e);
 
-void clean (vector<char*> & dirs)
-{
-  vector<char*>::iterator t;
+#ifdef USE_FLAC
+  if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
+  {
+    if (!get_flac(song, fn.c_str()) || (song->title == "" && song->artist == ""))
+    {
+      song->title = NOPATHEXT(fn, begin);
+      htmlify(song->title);
+      return true;
+    }
+    
+    return true;
+  }
+  
+  /* Ogg Vorbis or MP3 file? */
+  else if (ext == "ogg" || ext == "mp3")
+#else
+  if (ext == "ogg" || ext == "mp3")
+#endif
+  {
+    if (!get_taglib(song, fn.c_str()) || (song->title == "" && song->artist == ""))
+    {
+      song->title = NOPATHEXT(fn, begin);
+      htmlify(song->title);
+      return true;
+    }
 
-  for (t = dirs.begin(); t != dirs.end(); t++)
-    free (*t);
+    return true;
+  }
+  /* we did not do anything with this file.. */
+  else
+  {
+     DEBUG ("skipping unrecognized file", fn);
+     return false;
+  }
 }

@@ -157,62 +157,22 @@ void verify (vector<char*> & targets)
   }
 }
 
-#ifdef USE_FLAC
-bool getflac (struct Song* flac, const char* path)
+/* Simply purges the entries in a vector. */
+void clean (vector<struct Song *> * root)
 {
-  bool found_artist = false, found_title = false;
-  FLAC__Metadata_SimpleIterator *it = FLAC__metadata_simple_iterator_new();
+  vector<struct Song *>::iterator v;
 
-  if (!FLAC__metadata_simple_iterator_init(it, path, true, true))
-    return false;
+  /* All strings are on the stack, we don't need to do anything with them */
+  for (v = root->begin(); v != root->end(); v++)
+    delete *v;
 
-  do
-  {
-    if (FLAC__metadata_simple_iterator_get_block_type(it) ==
-          FLAC__METADATA_TYPE_VORBIS_COMMENT)
-    {
-      unsigned nc = 0, l = 0;
-      
-      FLAC__StreamMetadata *sm;
-      FLAC__StreamMetadata_VorbisComment_Entry *e;
-      
-      sm = FLAC__metadata_simple_iterator_get_block(it);
-
-      nc = sm->data.vorbis_comment.num_comments;
-      e = sm->data.vorbis_comment.comments;
-      
-      for (; nc > 0; nc--)
-      {
-        unsigned i;
-        string field;
-
-        for (i = 0; i < e->length; i++)
-          field += e->entry[i];
-        
-        if (field.find("ARTIST=") == 0)
-        {
-          flac->artist = field.substr(7, field.length() - 7);
-          found_artist = true;
-        }
-        else if (field.find("TITLE=") == 0)
-        {
-          flac->title = field.substr(6, field.length() - 6);
-          found_title = true;
-        }
-       
-        if (found_artist && found_title)
-        {
-          FLAC__metadata_simple_iterator_delete (it);
-          return true;
-        }
-        
-        e++;
-      }
-    }
-  }
-  while (FLAC__metadata_simple_iterator_next(it));
-
-  FLAC__metadata_simple_iterator_delete (it);
-  return false;
+  delete root;
 }
-#endif /* USE_FLAC */
+
+void clean (vector<char*> & dirs)
+{
+  vector<char*>::iterator t;
+
+  for (t = dirs.begin(); t != dirs.end(); t++)
+    free (*t);
+}

@@ -14,6 +14,9 @@
 # define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
+/* Useful macro to strip path and extension from a filename (string). */
+#define NOPATHEXT(full, path) full.substr(strlen(path) + 1, full.rfind('.') - strlen(path) - 1)
+
 struct Song 
 {
   std::string title;

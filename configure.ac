@@ -7,7 +7,7 @@ AC_PROG_CXX
 AC_LANG(C++)
 
 if test "$ac_cv_cxx_compiler_gnu" = yes; then
-	CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused"
+  CXXFLAGS="$CXXFLAGS -Wall -W -Wno-unused"
 fi
 
 LEX_LANG=CXX
@@ -22,9 +22,9 @@ AC_HELP_STRING([--enable-debug], [Enable debugging messages in TagReport.]),
 [debug="$enableval"], [debug=no])
 
 if test "$debug" = yes; then
-	DEBUG=""
+  DEBUG=""
 else
-	DEBUG="-DNDEBUG"
+  DEBUG="-DNDEBUG"
 fi
 
 AC_SUBST(DEBUG)
@@ -35,19 +35,19 @@ AC_HELP_STRING([--with-taglib-prefix=PATH], [Add another path to the search path
 
 AC_MSG_CHECKING([for location of TagLib includes])
 for dir in $userpath /usr /usr/local /opt; do
-	if test -d "$dir/include/taglib"; then
-		TAGLIB_ROOT="$dir"
-		break
-	fi
+  if test -d "$dir/include/taglib"; then
+    TAGLIB_ROOT="$dir"
+    break
+  fi
 done
 
 datadir="$datadir/tagreport"
 
 if test -z "$TAGLIB_ROOT"; then
-	AC_MSG_RESULT([not found])
-	AC_MSG_ERROR([Could not find TagLib headers. Try using --with-taglib-prefix?])
+  AC_MSG_RESULT([not found])
+  AC_MSG_ERROR([Could not find TagLib headers. Try using --with-taglib-prefix?])
 else
-	AC_MSG_RESULT($TAGLIB_ROOT)
+  AC_MSG_RESULT($TAGLIB_ROOT)
 fi
 
 AC_SUBST(TAGLIB_ROOT)
@@ -63,10 +63,10 @@ AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
 AC_CHECK_HEADER([FLAC/metadata.h],
 [
   AC_CHECK_LIB([FLAC], FLAC__metadata_simple_iterator_new,
-    [
-      AC_DEFINE(USE_FLAC, 1, [FLAC support works. Don't change!])
-      AC_SUBST(FLACLIB, -lFLAC)
-    ])
+  [
+    AC_DEFINE(USE_FLAC, 1, [FLAC support works. Don't change!])
+    AC_SUBST(FLACLIB, -lFLAC)
+  ])
 ])
 
 AC_CHECK_FUNCS(getopt_long)
@@ -74,7 +74,8 @@ AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
 
-AC_CHECK_HEADERS([fileref.h tag.h], , [AC_MSG_ERROR([Missing some TagLib headers, is your install complete?])])
+AC_CHECK_HEADERS([fileref.h tag.h], ,
+  [AC_MSG_ERROR([Missing some TagLib headers, is your install complete?])])
 
 CXXFLAGS="$save_CXXFLAGS"
 CPPFLAGS="$save_CPPFLAGS"
