@@ -98,9 +98,10 @@ AC_CHECK_HEADER(id3tag.h,
     AC_DEFINE(USE_ID3TAG, 1, [MAD ID3tag support works.])
     AC_SUBST(ID3TAGLIB, ["-lid3tag -lz"])
     use_ID3=1
-  ])
+  ], , [-lz])
 ])
 
+AC_CHECK_FUNC(getopt, [AC_DEFINE(HAVE_DECL_GETOPT, 1, [Needed for GNUgetopt headers to work on systems without a native getopt_long.])])
 AC_SEARCH_LIBS(getopt_long, gnugetopt, , [no_getopt_long=1], [-DHAVE_DECL_GETOPT])
 
 dnl We do this outside the command to allow SEARCH_LIBS to do its $LIBS
@@ -116,6 +117,7 @@ AC_SUBST(DOCBOOK)
 AC_CHECK_HEADERS([fileref.h tag.h],
 [
   AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
+  AC_SUBST(TAGLIB, [-ltag])
   use_TAGLIB=1
 ])
 
