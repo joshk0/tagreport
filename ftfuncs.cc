@@ -5,6 +5,8 @@
 #include "util.h"
 
 #include <cassert>
+#include <cctype>
+#include <cstring>
 #include <string>
 
 using namespace std;
