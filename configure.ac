@@ -17,6 +17,18 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_INSTALL
 
+AC_ARG_ENABLE(debug,
+AC_HELP_STRING([--enable-debug], [Enable debugging messages in TagReport.]),
+[debug="$enableval"], [debug=no])
+
+if test "$debug" = yes; then
+	DEBUG=""
+else
+	DEBUG="-DNDEBUG"
+fi
+
+AC_SUBST(DEBUG)
+
 AC_ARG_WITH(taglib-prefix,
 AC_HELP_STRING([--with-taglib-prefix=PATH], [Add another path to the search path for TagLib's headers.]),
 [userpath="$withval"], [])
