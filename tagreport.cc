@@ -1,8 +1,14 @@
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE // asprintf, basename...
+#endif
+
 #include <taglib/vorbisfile.h>
 #include <taglib/mpegfile.h>
+#include <taglib/tag.h>
 #include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
