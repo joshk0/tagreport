@@ -22,7 +22,7 @@ struct Song
 
 const char usage[] = \
 "TagReport " PACKAGE_VERSION " by Joshua Kwan <joshk@triplehelix.org>\n\
-Syntax: tagreport [-h] [-v] [-t template] [-o output] directory\n"
+Syntax: tagreport [-h] [-v] [-t template] [-o output] directory ...\n"
 #ifdef HAVE_GETOPT_LONG
 "Options:\n\
   -h, --help\t\t\tDisplay this help message.\n\
