@@ -2,6 +2,8 @@ CXX		= @CXX@
 LEX		= @LEX@
 YACC		= @YACC@
 INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
 DOCBOOK		= @DOCBOOK@
 
 CXXFLAGS	= @CXXFLAGS@ $(INCLUDES) $(DEFS)
@@ -70,14 +72,14 @@ distclean: clean
 
 install: tagreport tagreport.1
 	$(INSTALL) -d $(bindir)
-	$(INSTALL) -m 755 tagreport $(bindir)
+	$(INSTALL_PROGRAM) -m 755 tagreport $(bindir)
 	$(INSTALL) -d $(mandir)/man1
 	$(INSTALL) -m 644 tagreport.1 $(mandir)/man1
 	$(INSTALL) -d $(datadir)/def
 	
 	@for file in $(wildcard def/*.def); do \
-	  echo "$(INSTALL) -m 644 $$file $(datadir)/def"; \
-	  $(INSTALL) -m 644 $$file $(datadir)/def; \
+	  echo "$(INSTALL_DATA) $$file $(datadir)/def"; \
+	  $(INSTALL_DATA) $$file $(datadir)/def; \
 	done
 
 uninstall:
