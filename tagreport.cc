@@ -1,8 +1,23 @@
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE // asprintf, basename...
-#endif
+/*
+ * TagReport: a C++ program that will eventually output HTML formatted
+ * song lists from a specified directory.
+ *
+ * (C) 2003 Joshua Kwan <joshk@triplehelix.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #define DEBUG
+
+#include "tagreport.h"
 
 #include <taglib/vorbisfile.h>
 #include <taglib/mpegfile.h>
@@ -64,13 +79,17 @@ void traverse_dir (char* begin)
   struct dirent * contents;
   struct stat dino;
   char *comp, *fullpath = NULL;
+  const char *tmpartist = NULL, *tmptitle = NULL;
   TagLib::Tag *tag;
   
   if ((root = opendir(begin)) != NULL)
   {
     while ((contents = readdir(root)) != NULL)
     {
-      asprintf(&fullpath, "%s/%s", begin, contents->d_name);
+      int len = strlen(begin) + strlen(contents->d_name) + 2;
+      fullpath = (char*)malloc(len);
+      
+      snprintf(fullpath, len, "%s/%s", begin, contents->d_name);
 
       /* Skip .. and . */
       if (!strcmp(contents->d_name, ".") || !strcmp(contents->d_name, ".."))
@@ -137,11 +156,40 @@ void traverse_dir (char* begin)
 	    }
 	    else
 	    {
-	      printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());
+	      char *itera, *itert;
+	      tmpartist = tag->artist().toCString();
+	      tmptitle = tag->title().toCString();
+	      
+	      itera = (char*)tmpartist;
+	      itert = (char*)tmptitle;
+	      
+	      itera += strlen(tmpartist)-1;
+	      itert += strlen(tmptitle)-1;
+	      
+	      while (*itera == ' ')
+	      {
+		*itera = '\0';
+	        itera--;
+	      }
+
+	      while (*itert == ' ')
+	      {
+		*itert = '\0';
+	        itert--;
+	      }
+	      
+	      if (strcmp(tmpartist, "") && strcmp(tmptitle, ""))
+	      {
+		/* stuff things into struct Song */
+	        printf("%s - %s\n", tmpartist, tmptitle, contents->d_name);
+	      }
+	      else
+		goto printfn;
 	    }
 	  }
 	  else
 	  {
+printfn:
             /* strip the extension from a filename without ID */
 	    
             char* tmp = strrchr(contents->d_name, '.');
