@@ -13,10 +13,15 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_INSTALL
 
+AC_ARG_WITH(taglib-prefix,
+AC_HELP_STRING([--with-taglib-prefix=PATH], [Add another path to the search path for TagLib's headers.]),
+[$userpath="$withval"], [])
+
 AC_MSG_CHECKING([for location of TagLib includes])
-for dir in /usr /usr/local /opt; do
+for dir in $userpath /usr /usr/local /opt; do
 	if test -d "$dir/include/taglib"; then
 		TAGLIB_ROOT="$dir"
+		break
 	fi
 done
 
