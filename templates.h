@@ -25,15 +25,15 @@ class key
     string keyVal;
 };
 
-struct map_dollars
+struct replace_map
 {
   char* term;
   replace_types i;
   int term_length;
 };
 
-extern const struct map_dollars header_map[];
-extern const struct map_dollars body_map[];
+extern const struct replace_map header_map[];
+extern const struct replace_map body_map[];
 
 extern key template_title;
 extern key template_header;

@@ -25,13 +25,13 @@ key template_head_body, template_header; /* unset by default */
 
 FILE * template_file = NULL;
 
-const struct map_dollars header_map[] = {
+const struct replace_map header_map[] = {
   { "$count", COUNT, 6 },
   { "$date", DATE, 5 },
   { "$directory", DIRECTORY, 10 },
 };
 
-const struct map_dollars body_map[] = {
+const struct replace_map body_map[] = {
   { "$artist", ARTIST, 7 },
   { "$title", TITLE, 6 },
   { "$num", NUMBER, 4 },
@@ -85,12 +85,15 @@ string replace_body (const string & artist, const string & title, unsigned int n
 {
   string out = template_body.get();
   unsigned int i, j;
-  
+
+  /* replace \n with actual newlines */
   while ((i = out.find ("\\n")) != string::npos)
     out.replace (i, 2, "\n");
 
+  /* Look for each term in the list of replacements */
   for (i = 0; i < ARRAY_SIZE(body_map); i++)
   {
+    /* find all occurrences */
     while ((j = out.find(body_map[i].term)) != string::npos)
     {
       switch (body_map[i].i)
