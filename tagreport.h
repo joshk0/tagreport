@@ -1,10 +1,12 @@
 #ifndef included_TAGREPORT_H
 #define included_TAGREPORT_H
 
+#include <string>
+
 typedef struct Song 
 {
-  char* title;
-  char* artist;
+  std::string title;
+  std::string artist;
 };
 
 #endif

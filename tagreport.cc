@@ -19,13 +19,15 @@
 
 #include "tagreport.h"
 
-#include <taglib/vorbisfile.h>
-#include <taglib/mpegfile.h>
-#include <taglib/fileref.h>
-#include <taglib/tag.h>
-#include <taglib/id3v2tag.h>
+/* TagLib includes */
+#include <fileref.h>
+#include <tag.h>
 
+#include <vector>
 #include <cassert>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include <errno.h>
 #include <stdio.h>
@@ -38,17 +40,19 @@
 
 using namespace std;
 
-static void traverse_dir (char* begin);
+static vector<struct Song*>* traverse_dir (char* begin);
 static char* invoked_as;
+static void clean (vector<struct Song*>* root);
 
 int main (int argc, char* argv [])
 {
   struct stat id;
+  vector <struct Song*>* all_songs;
   invoked_as = argv[0];
   
   if (argc < 2)
   {
-    printf ("%s: not enough arguments (syntax: %s [directory])\n", argv[0], basename(argv[0]));
+    cout << argv[0] << ": not enough arguments (syntax: " << basename(argv[0]) << " [directory])" << endl;
     exit(1);
   }
   else
@@ -56,15 +60,31 @@ int main (int argc, char* argv [])
     stat (argv[1], &id);
     if (id.st_mode & S_IFDIR)
     {
-      traverse_dir(argv[1]);
+      unsigned int i;
+      all_songs = traverse_dir(argv[1]);
+
+      for (i = 0; i < all_songs->size(); i++)
+      {
+	if ((*all_songs)[i]->artist != "")
+	{
+          cout << i << ". "
+	       << (*all_songs)[i]->artist
+	       << " - " << (*all_songs)[i]->title
+	       << endl;
+	}
+	else
+          cout << i << ". " << (*all_songs)[i]->title << endl;
+      //output_html("playlist.htm", all_songs);
+      }
     }
     else
     {
-      fprintf (stderr, "%s: %s: not a directory!\n", argv[0], argv[1]);
+      cerr << argv[0] << ": " << argv[1] << ": not a directory!" << endl;
       return 1;
     }
   }
   
+  clean(all_songs);
   return 0;
 }
 
@@ -73,67 +93,71 @@ int main (int argc, char* argv [])
  * output: playlist.htm (XXX its currently stdout)
  */
 
-void traverse_dir (char* begin)
+vector<struct Song*>* traverse_dir (char* begin)
 {
   DIR* root;
   struct dirent * contents;
   struct stat dino;
-  char *comp, *fullpath = NULL;
-  const char *tmpartist = NULL, *tmptitle = NULL;
   TagLib::Tag *tag;
+  vector <struct Song *> *all_songs = new vector<struct Song*>;
   
   if ((root = opendir(begin)) != NULL)
   {
     while ((contents = readdir(root)) != NULL)
     {
-      int len = strlen(begin) + strlen(contents->d_name) + 2;
-      fullpath = (char*)malloc(len);
-      
-      snprintf(fullpath, len, "%s/%s", begin, contents->d_name);
+      string fn = contents->d_name;
+      ostringstream fp;
+     
+      fp << begin << "/" << fn;
 
       /* Skip .. and . */
-      if (!strcmp(contents->d_name, ".") || !strcmp(contents->d_name, ".."))
-      {
-        free(fullpath);
+      if (fn == "." || fn == "..")
         continue;
-      }
 
       /* Recurse if this entry is actually a directory */
-      stat (fullpath, &dino);
+      stat (fp.str().c_str(), &dino);
       
       if (dino.st_mode & S_IFDIR)
       {
+	vector<struct Song*>* recursion;
+	
 #ifdef DEBUG
-        fprintf(stderr, "DEBUG: Recursing into %s\n", fullpath);
+        cerr << "DEBUG: Recursing into " << fp.str() << endl;
 #endif
-        traverse_dir(fullpath);
+	recursion = traverse_dir((char*)fp.str().c_str());
+        all_songs->insert (all_songs->end(), recursion->begin(), recursion->end());
       }
 
       /* Otherwise, it's a normal file */
       else
       {
-        /* Skip filenames with no extension */
-        if ((comp = strrchr(contents->d_name, '.')) == NULL)
+	/* will be used in all cases */
+        struct Song * tmpsong = (struct Song *)malloc(sizeof(struct Song));
+        
+	/* Skip filenames with no extension */
+        if (fn.find('.') == string::npos)
         {
 #ifdef DEBUG
-          fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
+          cerr << "DEBUG: skipping extensionless file " << fn << endl;
 #endif
-          free(fullpath);
+	  free(tmpsong);
+	  continue;
         }
         
-	else if (contents->d_name[strlen(contents->d_name) - 1] == '.')
+	else if (fn[fn.length() - 1] == '.')
 	{
 #ifdef DEBUG
-          fprintf(stderr, "DEBUG: blank extension for file %s\n", contents->d_name);
+          cerr << "DEBUG: blank extension for file " << fn << endl;
 #endif
-	  free(fullpath);
+	  free(tmpsong);
+	  continue;
 	}
 
         /* Ogg Vorbis or MP3 file? */
 	else if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
             || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3"))
 	{
-          TagLib::FileRef ref (fullpath);
+          TagLib::FileRef ref (fp.str().c_str());
 
           if(ref.isNull())
             abort();
@@ -142,66 +166,47 @@ void traverse_dir (char* begin)
         
 	  if (!tag->artist().isNull() && !tag->title().isNull())
 	  {
-	    if (tag->artist().isEmpty() || tag->title().isEmpty())
+            /* Non-null but empty tag */
+	    if (tag->artist().isEmpty() || tag->title().isEmpty()) 
 	    {
-	      char *tmp = strrchr(contents->d_name, '.');
-
-	      if (tmp)
-	      {
-		*tmp = '\0';
-		puts(contents->d_name);
-	      }
-	      else
-		abort();
+	      tmpsong->artist = "";
+	      tmpsong->title = fn.substr(0, fn.rfind('.'));
+	      all_songs->push_back(tmpsong);
 	    }
-	    else
+	    else /* Tag is non-empty */
 	    {
-	      char *itera, *itert;
-	      tmpartist = tag->artist().toCString();
-	      tmptitle = tag->title().toCString();
+              TagLib::String a, t;
 	      
-	      itera = (char*)tmpartist;
-	      itert = (char*)tmptitle;
-	      
-	      itera += strlen(tmpartist)-1;
-	      itert += strlen(tmptitle)-1;
-	      
-	      while (*itera == ' ')
+	      a = tag->artist().stripWhiteSpace();
+	      t = tag->title().stripWhiteSpace();
+              
+	      if (!a.isEmpty() && !t.isEmpty())
 	      {
-		*itera = '\0';
-	        itera--;
-	      }
-
-	      while (*itert == ' ')
-	      {
-		*itert = '\0';
-	        itert--;
-	      }
-	      
-	      if (strcmp(tmpartist, "") && strcmp(tmptitle, ""))
-	      {
-		/* stuff things into struct Song */
-	        printf("%s - %s\n", tmpartist, tmptitle, contents->d_name);
+		tmpsong->artist = a.to8Bit(false);
+		tmpsong->title = t.to8Bit(false);
+		all_songs->push_back(tmpsong);
 	      }
 	      else
 		goto printfn;
 	    }
 	  }
-	  else
+	  else /* NO TAG! */
 	  {
-printfn:
             /* strip the extension from a filename without ID */
-	    
-            char* tmp = strrchr(contents->d_name, '.');
+printfn:
+            string noext = fn.substr(0, fn.rfind('.'));
 
-	    if (tmp)
+	    if (noext != "")
 	    {
-	      *tmp  = '\0';
-	      puts(contents->d_name);
+	      tmpsong->artist = "";
+	      tmpsong->title = noext;
+	      all_songs->push_back(tmpsong);
 	    }
 	    else
-	      abort(); /* SHOULD NOT HAPPEN */
-	    
+	    {
+              free(tmpsong);
+	      continue;
+	    }
 	  }
 	}
         
@@ -209,19 +214,28 @@ printfn:
         /* Note that we did not do anything with this file */
         else
 	{
-          fprintf(stderr, "DEBUG: skipping unrecognized file %s\n", contents->d_name, contents->d_type);
+          cerr << "DEBUG: skipping unrecognized file " << fn << endl;
+	  free(tmpsong);
         }
 #endif
       }
-
-      free (fullpath);
     }
   }
   /* If we get here there was SOME sort of error with opendir() */
   else {
-    fprintf (stderr, "%s: Error reading directory: %s\n", invoked_as, strerror(errno));
-    return;
+    cerr << invoked_as << ": Error reading directory: " << strerror(errno) << endl;
+    exit(1);
   }
 
   closedir(root);
+
+  return all_songs;
+}
+
+void clean (vector<struct Song *> * root)
+{
+  vector<struct Song *>::iterator v;
+
+  for (v = root->begin(); v != root->end(); v++)
+    free (*v);
 }
