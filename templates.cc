@@ -9,8 +9,16 @@
 using namespace std;
 
 /* Define variables previously extern'd */
-key template_title, template_header, template_prebody, template_head_body;
-key template_stats, template_body_tag, template_body, template_footer;
+key template_title ("TagReport Generated Playlist");
+key template_head_body; /* unset by default */
+key template_body_tag ("<body bgcolor=\"#000000\" text=\"#FFFFFF\">");
+key template_header; /* unset by default */
+key template_stats ("<h2>$directory</h2><hr />\n\
+<p>Generated at $date <br />\n\
+Scanned $count songs.</p>");
+key template_prebody ("<p>");
+key template_body ("$num. $a-t<br />");
+key template_footer ("</p>");
 
 FILE * template_file = NULL;
 
@@ -23,6 +31,8 @@ struct map_dollars header_map[] = {
 struct map_dollars body_map[] = {
   { "$artist", ARTIST, 7 },
   { "$title", TITLE, 6 },
+  { "$num", NUMBER, 4 },
+  { "$a-t", ARTIST_TITLE, 4 }
 };
 
 string replace_header (const string & in, int count, const string & directory)
@@ -68,7 +78,7 @@ string replace_header (const string & in, int count, const string & directory)
   return out;
 }
 
-string replace_body (const string & artist, const string & title)
+string replace_body (const string & artist, const string & title, unsigned int n)
 {
   string out = template_body.get();
   unsigned int i, j;
@@ -76,18 +86,42 @@ string replace_body (const string & artist, const string & title)
   while ((i = out.find ("\\n")) != string::npos)
     out.replace (i, 2, "\n");
 
-  for (i = 0; i < 2; i++)
+  for (i = 0; i < 4; i++)
   {
     while ((j = out.find(body_map[i].term)) != string::npos)
     {
-      if (body_map[i].i == ARTIST)
-        out.replace (j, body_map[i].term_length, artist);
-             
-      else if (body_map[i].i == TITLE)
-        out.replace (j, body_map[i].term_length, title);
+      switch (body_map[i].i)
+      {
+        case ARTIST:
+          out.replace (j, body_map[i].term_length, artist);
+          break;
+	  
+        case TITLE:
+          out.replace (j, body_map[i].term_length, title);
+	  break;
 
-      else
-        abort();
+        case ARTIST_TITLE:
+	  if (artist == "") /* Left unset by traverse_dir */
+	    out.replace (j, body_map[i].term_length, title);
+	  else
+	  {
+            ostringstream s;
+	    s << artist << " - " << title;
+	    out.replace (j, body_map[i].term_length, s.str());
+	  }
+	  break;
+
+	case NUMBER:
+	{
+          ostringstream s;
+	  s << n;
+          out.replace (j, body_map[i].term_length, s.str());
+	  break;
+	}
+
+	default: /* wha? */
+	  abort();
+      }
     }
   }
 

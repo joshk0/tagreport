@@ -1,5 +1,6 @@
 # This is a sample TagReport HTML template file.
 # Comments are ONLY prefixed with #. Whitespace is ignored.
+# For all settings, \n will be translated into newlines.
 
 # For this part of the file there are certain special strings
 # that are automatically replaced.
@@ -27,12 +28,13 @@ stats = "<p>$count songs scanned on $date.</p>"
 
 prebody = "<table>\n<tr><th>Artist</th><th>Song Title</th></tr>"
 
-# body is special because it only recognizes two substitutions:
+# body is special because it recognizes some different substitutions:
 # $artist - Artist of the current song
-# $title - Title of the current song
-#
-# If a song has no tag or an incomplete one, only $title will be filled, and
-# $artist will be empty.
+# $title  - Title of the current song
+# $num    - Number of the current song (in order of scanning)
+# $a-t    - A special combined artist + title form. If artist is unset or blank,
+#           it will only print the title. If not, it will be equivalent to
+#           '$artist - $title'.
 #
 # body will be written to the file (with substitutions made) for each song,
 # so in this case it is a complete table row.

@@ -6,7 +6,11 @@
 
 #include "templates.h"
 
-#define WARN_SHADOW(e) cerr << "Warning: additional definition of '" << e << "' shadows previous" << endl
+#define WARN_SHADOW_AND_SET(e, f, g) \
+if (!(e).is_default() && (e).is_set()) \
+  cerr << "Warning: additional definition of '" << f \
+       << "' shadows previous" << endl; \
+(e).set (g)
 
 using namespace std;
 
@@ -39,59 +43,35 @@ KeyPair: KeyType '=' TYPE_VALUE {
   switch ($1)
   {
     case TYPE_TITLE:
-      if (template_title.is_set())
-        WARN_SHADOW("title");
-	
-      template_title.set ($3);
+      WARN_SHADOW_AND_SET(template_title, "title", $3);
       break;
       
     case TYPE_HEADER:
-      if (template_header.is_set())
-        WARN_SHADOW("header");
-      
-      template_header.set ($3);
+      WARN_SHADOW_AND_SET(template_header, "header", $3);
       break;
       
     case TYPE_STATS:
-      if (template_stats.is_set())
-        WARN_SHADOW("stats");
-
-      template_stats.set ($3);
+      WARN_SHADOW_AND_SET(template_stats, "stats", $3);
       break;
       
     case TYPE_PREBODY:
-      if (template_prebody.is_set())
-        WARN_SHADOW("prebody");
-
-      template_prebody.set ($3);
+      WARN_SHADOW_AND_SET(template_prebody, "prebody", $3);
       break;
 
     case TYPE_BODY:
-      if (template_body.is_set())
-        WARN_SHADOW("body");
-
-      template_body.set ($3);
+      WARN_SHADOW_AND_SET(template_body, "body", $3);
       break;
 
     case TYPE_BODY_TAG:
-      if (template_body_tag.is_set())
-        WARN_SHADOW("bodytag");
-
-      template_body_tag.set ($3);
+      WARN_SHADOW_AND_SET(template_body_tag, "bodytag", $3);
       break;
 
     case TYPE_HEAD_BODY:
-      if (template_head_body.is_set())
-        WARN_SHADOW("headbody");
-
-      template_head_body.set ($3);
+      WARN_SHADOW_AND_SET(template_head_body, "headbody", $3);
       break;
 
     case TYPE_FOOTER:
-      if (template_footer.is_set())
-        WARN_SHADOW("footer");
-
-      template_footer.set ($3);
+      WARN_SHADOW_AND_SET(template_footer, "footer", $3);
       break;
 
     default: /* should NEVER ever ever happen */

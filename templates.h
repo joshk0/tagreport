@@ -8,18 +8,20 @@
 
 using namespace std;
 
-typedef enum { ARTIST, TITLE, COUNT, DIRECTORY, DATE } replace_types;
+typedef enum { ARTIST, TITLE, COUNT, DIRECTORY, DATE, NUMBER, ARTIST_TITLE } replace_types;
 
 class key
 {
   public:
-    key () : isSet(false) {};
+    key () : isSet(false), isDefault(false) {};
+    key (char* init) : isSet(true), isDefault(true), keyVal(init) {};
     inline bool is_set (void) const { return isSet; };
-    inline void set (string in) { keyVal = in; isSet = true; };
+    inline bool is_default (void) const { return isDefault; };
+    inline void set (string in) { keyVal = in; isSet = true; isDefault = false; };
     inline string get (void) const { return keyVal; };
 
   private:
-    bool isSet;
+    bool isSet, isDefault;
     string keyVal;
 };
 
@@ -45,7 +47,7 @@ extern key template_footer;
 extern FILE * template_file;
 
 string replace_header (const string & in, int count, const string & directory);
-string replace_body (const string & artist, const string & title);
+string replace_body (const string & artist, const string & title, unsigned int n);
 
 #endif
 
