@@ -47,9 +47,6 @@
 
 using namespace std;
 
-extern int yyparse (void);
-extern FILE *yyin;
-
 static vector<struct Song*>* traverse_dir (char* begin);
 
 #ifdef NDEBUG
@@ -144,21 +141,7 @@ int main (int argc, char* argv [])
 
   /* Load the template into memory. */
   if (template_fn)
-  {
-    if ((template_file = fopen (template_fn, "r")) == NULL)
-    {
-      cerr << "Error reading template " << template_fn << ": " << strerror(errno) << endl;
-      free(template_fn);
-      return 1;
-    }
-    else
-    {
-      yyin = template_file;
-      yyparse();
-      fclose(template_file);
-      free(template_fn);
-    }
-  }
+    read_template_file(template_fn);
  
   /* Add all targets on the command line. */
   if (optind < argc)

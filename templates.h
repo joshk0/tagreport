@@ -44,10 +44,9 @@ extern key template_body;
 extern key template_body_tag;
 extern key template_footer;
 
-extern FILE * template_file;
-
 string replace_header (const string & in, int count, const string & directory);
 string replace_body (const string & artist, const string & title, unsigned int n);
+void read_template_file (char * template_fn);
 
 /* Some very useful macros. */
 #define OUTPUT_HEADER_IF_SET(stream, vec, dir, tmpl) \

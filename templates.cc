@@ -4,6 +4,8 @@
 #include "templates.h"
 #include "util.h"
 
+#include <cstdio>
+#include <iostream>
 #include <string>
 #include <sstream>
 
@@ -17,13 +19,14 @@ using namespace std;
 
 #include "default.h"
 
+extern int yyparse (void);
+extern FILE *yyin;
+
 /* Default templates */
 key template_title (DEFAULT_TITLE), template_body_tag(DEFAULT_BODY_TAG);
 key template_stats (DEFAULT_STATS), template_prebody(DEFAULT_PREBODY);
 key template_body (DEFAULT_BODY), template_footer(DEFAULT_FOOTER);
 key template_head_body, template_header; /* unset by default */
-
-FILE * template_file = NULL;
 
 const struct replace_map header_map[] = {
   { "$count", COUNT, 6 },
@@ -132,4 +135,24 @@ string replace_body (const string & artist, const string & title, unsigned int n
   }
 
   return out;
+}
+
+void read_template_file (char * template_fn)
+{
+  FILE * template_file = NULL;
+
+  if ((template_file = fopen (template_fn, "r")) == NULL)
+  {
+    cerr << "Error reading template " << template_fn << ": " << strerror(errno) << endl;
+    free(template_fn);
+    if (!force)
+      exit(1);
+  }
+  else
+  {
+    yyin = template_file;
+    yyparse();
+    fclose(template_file);
+    free(template_fn);
+  }
 }
