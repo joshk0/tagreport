@@ -66,8 +66,8 @@ else
   [
     AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
     AC_SUBST(TAGLIB, [-ltag])
-    AC_SUBST(TAGLIB_INCLUDE, [-I\$\(TAGLIB_ROOT\)/include/taglib])
-    AC_SUBST(TAGLIB_LD, [-L\$\(TAGLIB_ROOT\)/lib])
+    TAGLIB_INCLUDE="-I\$\(TAGLIB_ROOT\)/include/taglib"
+    TAGLIB_LD="-L\$\(TAGLIB_ROOT\)/lib"
     use_TAGLIB=1
   ])
 
@@ -165,6 +165,9 @@ echo
 if test $use_TAGLIB -eq 0 && test $use_OGG -eq 0 && test $use_ID3 -eq 0 && test $use_FLAC -eq 0; then
   AC_MSG_ERROR([You need to install at least one of the following: taglib, libvorbisfile, id3tag, libflac.])
 fi
+
+AC_SUBST(TAGLIB_INCLUDE)
+AC_SUBST(TAGLIB_LD)
 
 CXXFLAGS="$save_CXXFLAGS"
 CPPFLAGS="$save_CPPFLAGS"
