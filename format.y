@@ -12,6 +12,7 @@ using namespace std;
 
 extern int yylex(void);
 extern void yyerror(const char*);
+extern char *yytext;
 
 %}
 
@@ -20,14 +21,14 @@ extern void yyerror(const char*);
 	int kt;
 }
 
-%token   BODY_START TYPE_TITLE TYPE_HEADER TYPE_STATS TYPE_PREBODY TYPE_FOOTER
-%token   <s> BODY TYPE_VALUE
+%token   TYPE_TITLE TYPE_HEADER TYPE_STATS TYPE_PREBODY TYPE_FOOTER TYPE_BODY
+%token   <s> TYPE_VALUE
 
 %type	<kt> KeyType
 
 %%
 
-Template: KeyPairs BODY_START BODY
+Template: KeyPairs
 
 KeyPairs: KeyPairs KeyPair
 	| KeyPair
@@ -41,7 +42,6 @@ KeyPair: KeyType '=' TYPE_VALUE {
         WARN_SHADOW("title");
 	
       template_title.set ($3);
-      
       break;
       
     case TYPE_HEADER:
@@ -55,7 +55,7 @@ KeyPair: KeyType '=' TYPE_VALUE {
       if (template_stats.is_set())
         WARN_SHADOW("stats");
 
-      template_stats.set($3);
+      template_stats.set ($3);
       break;
       
     case TYPE_PREBODY:
@@ -65,7 +65,15 @@ KeyPair: KeyType '=' TYPE_VALUE {
       template_prebody.set ($3);
       break;
 
+    case TYPE_BODY:
+      if (template_body.is_set())
+        WARN_SHADOW("body");
+
+      template_body.set ($3);
+      break;
+
     default: /* should NEVER ever ever happen */
+      cout << "OWNED: received " << $1 << " in switch" << endl; 
       abort();
   }
 }
@@ -74,12 +82,13 @@ KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
 	| TYPE_HEADER	{ $$ = TYPE_HEADER; }
 	| TYPE_STATS	{ $$ = TYPE_STATS; }
 	| TYPE_PREBODY	{ $$ = TYPE_PREBODY; }
-	| error		{ cerr << "Unrecognized key type at line " << @1.first_line << ", continuing" << endl; }
+	| TYPE_FOOTER   { $$ = TYPE_FOOTER; }
+	| TYPE_BODY	{ $$ = TYPE_BODY; }
 	;
 
 %%
 
 void yyerror(const char* s)
 {
-  cerr << "parse error: " << s << endl;
+  cerr << "couldn't parse \"" << yytext << "\": " << s << endl;
 }

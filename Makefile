@@ -7,7 +7,7 @@ SRCS_CXX = tagreport.cc templates.cc
 OBJS = $(SRCS_C:.c=.o) $(SRCS_CXX:.cc=.o)
 
 INCLUDES = -I/usr/local/include/taglib
-LIBS = -ltag -ll
+LIBS = -ltag
 
 all: tagreport
 
@@ -21,7 +21,7 @@ tagreport: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)
 
 lex.yy.c: format.l
-	flex -d $<
+	flex $<
 
 y.tab.h y.tab.c: format.y
 	bison -d -y $<

@@ -47,6 +47,8 @@
 
 using namespace std;
 
+extern int yyparse (void);
+
 static vector<struct Song*>* traverse_dir (char* begin);
 static void clean (vector<struct Song*>* root);
 static void htmlify (string &);
@@ -68,7 +70,7 @@ int main (int argc, char* argv [])
   template_file = NULL;
   
   /* read all options - for now only -o */
-  while ((opt = getopt(argc, argv, "o:v")) != -1)
+  while ((opt = getopt(argc, argv, "t:o:v")) != -1)
   {
     switch(opt)
     {
@@ -82,7 +84,15 @@ int main (int argc, char* argv [])
 
       case 't':
         if ((template_file = fopen (optarg, "r")) == NULL)
+	{
           cerr << "Error reading template " << optarg << ": " << strerror(errno) << endl;
+	  return 1;
+	}
+	else
+	{
+          yyparse();
+          fclose (template_file);
+	}
         
       case '?':
         return 1;

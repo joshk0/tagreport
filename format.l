@@ -6,6 +6,8 @@
 %{
 
 #include <string>
+#include <iostream>
+
 using namespace std;
 
 #include "y.tab.h"
@@ -27,8 +29,7 @@ using namespace std;
 %}
 
 VALUE		\".*\"
-BODY		[.\n]*
-WHITE		[\t ]*
+WHITE		[\n\t ]*
 COMMENT		^#.*
 
 %%             /* BEGIN RULES SECTION */
@@ -40,16 +41,14 @@ COMMENT		^#.*
 	return TYPE_VALUE;
 }
 
-{BODY}		{ yylval.s = strdup(yytext); return BODY; }
 {WHITE}		{ }
 {COMMENT}	{ }
 
 "="		{ return '='; }
-"%body%"	{ return BODY_START; }
 "title"		{ return TYPE_TITLE; }
 "header"	{ return TYPE_HEADER; }
 "stats"		{ return TYPE_STATS; }
 "prebody"	{ return TYPE_PREBODY; }
 "footer"	{ return TYPE_FOOTER; }
-
+"body"		{ return TYPE_BODY; }
 %%

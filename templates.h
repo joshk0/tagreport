@@ -8,6 +8,8 @@
 
 using namespace std;
 
+typedef enum { ARTIST, TITLE, COUNT, DIRECTORY, DATE } replace_types;
+
 class key
 {
   public:
@@ -21,6 +23,15 @@ class key
     string keyVal;
 };
 
+struct map_dollars
+{
+  string term;
+  replace_types i;  
+};
+
+extern struct map_dollars header_map[];
+extern struct map_dollars body_map[];
+
 extern key template_title;
 extern key template_header;
 extern key template_prebody;
@@ -29,4 +40,8 @@ extern key template_body;
 
 extern FILE * template_file;
 
+bool replace_header (string & in, int count, const string & directory);
+bool replace_body (string & in, const string & artist, const string & title);
+
 #endif
+
