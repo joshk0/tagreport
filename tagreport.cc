@@ -369,16 +369,30 @@ vector<struct Song*>* traverse_dir (char* begin)
         else
         {
           string::iterator e;
-          /* Grab the first three letters of the extension (if possible)
+          /* Grab the first four letters of the extension (if possible)
            * and store it in ext as lowercase. */
-          ext = ext.substr(ext.rfind('.') + 1, 3);
+          ext = ext.substr(ext.rfind('.') + 1, 4);
         
           for (e = ext.begin(); e != ext.end(); e++)
             *e = tolower(*e);
         }
+#ifdef HAVE_METAFLAC
+	if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
+        {
+          tmpsong = metaflac(fp.str().c_str());
 
+	  if (tmpsong->title == "" || tmpsong->artist == "")
+            delete tmpsong; /* Just ignore it. */
+	  else
+            all_songs->push_back(tmpsong);
+        }
+	
         /* Ogg Vorbis or MP3 file? */
+	else if (ext == "ogg" || ext == "mp3")
+#else
         if (ext == "ogg" || ext == "mp3")
+#endif
+
         {
           TagLib::Tag *tag;
           TagLib::FileRef ref (fp.str().c_str());

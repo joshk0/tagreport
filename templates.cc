@@ -70,7 +70,7 @@ string replace_header (const string & in, int count, const string & directory)
           s << directory;
           break;
 
-        default: /* wtf dude */
+        default: /* huh?!? this better not happen */
           abort();
       }
       

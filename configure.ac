@@ -59,6 +59,12 @@ CXXFLAGS="$CXXFLAGS -I$TAGLIB_ROOT/include/taglib"
 CPPFLAGS="$CPPFLAGS -I$TAGLIB_ROOT/include/taglib"
 
 AC_CHECK_PROGS(DOCBOOK, docbook-to-man, [:])
+AC_CHECK_PROGS(METAFLAC, metaflac, no)
+
+if test "$ac_cv_prog_METAFLAC" = metaflac; then
+  AC_DEFINE(HAVE_METAFLAC, 1, [Define if metaflac is available.])
+fi
+
 AC_CHECK_FUNCS(getopt_long)
 AC_CHECK_HEADERS([getopt.h libiberty.h])
 

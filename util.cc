@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <ctime>
 #include <cstring>
+#include <cstdio>
 #include <sys/stat.h>
 
 #include <iostream>
@@ -152,3 +153,37 @@ void verify (vector<char*> & targets)
   }
 }
 
+struct Song * metaflac (const char* path)
+{
+#ifndef HAVE_METAFLAC
+  DEBUG("No metaflac, will not process", path);
+  return NULL;
+#else
+  FILE* mf;
+  ostringstream cmd;
+  char buf[1024];
+  struct Song *flac = new struct Song;
+
+  /* Ewwwww! Sick! */
+  cmd << "metaflac --show-vc-field=artist --show-vc-field=title " << path;
+  mf = popen(cmd.str().c_str(), "r");
+
+  while (fgets(buf, 1024, mf) != NULL)
+  {
+    string h;
+
+    h = buf;
+
+    if (h.find("ARTIST=") == 0) /* should be first */
+      flac->artist = h.substr(7, h.length() - 8);
+    else if (h.find("TITLE=") == 0)
+      flac->title = h.substr(6, h.length() - 7);
+    else
+      DEBUG("read failed, buf is", h);
+  }
+
+  pclose(mf);
+  
+  return flac;
+#endif
+}
