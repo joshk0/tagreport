@@ -23,11 +23,13 @@ tagreport: $(OBJS)
 lex.yy.c: format.l
 	flex $<
 
-y.tab.h y.tab.c: format.y
+y.tab.c: format.y
 	bison -d -y $<
 
+y.tab.h: y.tab.c
+
 lex.yy.c: templates.h y.tab.h
-y.tab.c: templates.h 
+y.tab.c: templates.h
 
 .depend: $(SRCS_CXX)
 	$(CXX) -MM $(SRCS_CXX) > .depend

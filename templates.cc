@@ -40,6 +40,8 @@ string replace_header (const string & in, int count, const string & directory)
     while ((j = out.find (header_map[i].term)) != string::npos)
     {
       ostringstream s;
+      char* t;
+      
       switch (header_map[i].i)
       {
         case COUNT:
@@ -47,7 +49,9 @@ string replace_header (const string & in, int count, const string & directory)
 	  break;
 
 	case DATE:
-	  s << get_time_string();
+	  t = get_time_string();
+	  s << t;
+	  free(t);
           break;
 
 	case DIRECTORY:

@@ -98,6 +98,8 @@ KeyPair: KeyType '=' TYPE_VALUE {
       cout << "FATAL: received unexpected " << $1 << " in switch" << endl; 
       abort();
   }
+
+  free($3);
 }
 
 KeyType : TYPE_TITLE	{ $$ = TYPE_TITLE; }
