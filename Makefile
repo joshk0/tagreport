@@ -16,5 +16,10 @@ lex.yy.c: format.l
 y.tab.c: format.y
 	bison -d -y $<
 
+y.tab.h: y.tab.c
+
+format.y: templates.h
+format.l: y.tab.h
+
 clean:
-	rm -f tagreport *.o core a.out lex.yy.c y.tab.c *~
+	rm -f tagreport *.o core a.out lex.yy.c y.tab.c y.tab.h *~
