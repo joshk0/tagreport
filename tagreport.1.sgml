@@ -21,7 +21,7 @@
   </refmeta>
   <refnamediv>
     <refname>tagreport</refname>
-    <refpurpose>produces HTML playlists of MP3/Ogg directories</refpurpose>
+    <refpurpose>produces HTML playlists of MP3/Ogg/FLAC directories</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
@@ -43,7 +43,9 @@
     is more powerful in some respects.</para>
 
     <para>It currently only supports scanning of MP3 and Ogg Vorbis audio
-    files. Flac is forthcoming but not supported as of this version.</para>
+    files. The FLAC format is mostly supported, but not extensively tested,
+    and only available if the metaflac program is on your system at build
+    time.</para>
 
     <para>TagReport also supports customizable HTML templates using a simple
     file format. Look in the def/ directory in the source for a sample one
@@ -114,7 +116,7 @@
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>xmms(1).</para>
+    <para>xmms(1), metaflac(1).</para>
 
   </refsect1>
   <refsect1>
