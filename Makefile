@@ -4,7 +4,7 @@ DEFS = -DNDEBUG
 
 all: tagreport
 
-tagreport: tagreport.cc
+tagreport: tagreport.cc tagreport.h html.h
 	$(CXX) $(CXXFLAGS) $(DEFS) -I/usr/local/include/taglib $< -o $@ -ltag
 
 clean:

@@ -3,6 +3,12 @@
 
 #include <string>
 
+#ifndef NDEBUG
+# define DEBUG(x, y) cerr << "DEBUG: " << x << ' ' << y << endl
+#else
+# define DEBUG(x, y)
+#endif
+
 typedef struct Song 
 {
   std::string title;

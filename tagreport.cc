@@ -16,6 +16,7 @@
  */
 
 #include "tagreport.h"
+#include "html.h"
 
 /* TagLib includes */
 #include <fileref.h>
@@ -28,7 +29,7 @@
 #include <fstream>
 #include <string>
 
-/* C/C++ hybrids. */
+/* C++ forwarding headers */
 #include <cassert>
 #include <cctype>
 #include <cerrno>
@@ -45,28 +46,12 @@
 
 using namespace std;
 
-static string HTMLdtd =
-"<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n\
-<!DOCTYPE html\n\
-     PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
-     \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
-	  
-static string HTMLheader =
-"<html>\n\
-<head>\n\
-<title>TagReport Generated Playlist</title>\n\
-</head>\n\
-<body bgcolor=\"#000000\" text=\"#FFFFFF\">\n\
-<h2>Playlist of ";
-
-static string HTMLfooter =
-"</p><hr /></body>\n\
-</html>";
-
 static vector<struct Song*>* traverse_dir (char* begin);
-static char* invoked_as;
 static void clean (vector<struct Song*>* root);
 static void htmlify (string &);
+
+/* Stores argv[0] */
+char* invoked_as;
 
 int main (int argc, char* argv [])
 {
@@ -112,6 +97,7 @@ int main (int argc, char* argv [])
     now = localtime(&now_secs);
     strftime (now_date, 18, "%H:%M, %F", now);
     
+    /* Default output location - $PWD/playlist.htm */
     if (!outfile)
       outfile = strdup("playlist.htm");
     
@@ -132,11 +118,13 @@ int main (int argc, char* argv [])
     all_songs = traverse_dir(target);
     cout << endl;
     
+    /* Some statistics ... */
     out << target << "</h2><hr />" << endl;
     out << "<p>Generated at " << now_date << "<br />" << endl;
     out << "Scanned " << all_songs->size() << " songs.</p>" << endl;
     out << "<p>";
     
+    /* Loop through the vector and HTML-output its contents. */
     for (i = 0; i < all_songs->size(); i++)
     {
       if ((*all_songs)[i]->artist != "")
@@ -150,6 +138,7 @@ int main (int argc, char* argv [])
         out << i << ". " << (*all_songs)[i]->title << "<br />" << endl;
     }
 
+    /* Snicker, snicker! */
     if (all_songs->size() == 0)
     {
       out << "<i>Without music, life would be an error. The German imagines even God singing songs.</i><br />" << endl;
@@ -158,8 +147,10 @@ int main (int argc, char* argv [])
 
     out << HTMLfooter;
 
+    /* Flush the file and close it */
     out.close();
 
+    /* Move temporary file to the real thing */
     if (rename (tmpout.str().c_str(), outfile) == -1)
     {
       cout << "error moving " << tmpout.str() << " to " << outfile << ": " << strerror(errno) << endl;
@@ -174,6 +165,7 @@ int main (int argc, char* argv [])
     else
       cout << "Wrote " << outfile << ", but found no valid songs!" << endl;
   }
+  /* !S_ISDIR(dino.st_mode) */
   else
   {
     cerr << argv[0] << ": " << target << ": not a directory!" << endl;
@@ -195,7 +187,8 @@ int main (int argc, char* argv [])
 
 /* traverse_dir()
  * input: path to directory to traverse
- * output: playlist.htm (XXX its currently stdout)
+ * Returns a vector of struct Song*s that will later be parsed to
+ * output the HTML
  */
 
 vector<struct Song*>* traverse_dir (char* begin)
@@ -229,15 +222,14 @@ vector<struct Song*>* traverse_dir (char* begin)
       {
         vector<struct Song*>* recursion;
         
-#ifndef NDEBUG
-        cerr << "DEBUG: Recursing into " << fp.str() << endl;
-#endif
-        recursion = traverse_dir((char*)fp.str().c_str());
+        DEBUG("Recursing into", fp.str());
+        
+	recursion = traverse_dir((char*)fp.str().c_str());
         all_songs->insert (all_songs->end(), recursion->begin(), recursion->end());
         delete recursion; /* Already copied into all_songs */
       }
 
-      /* Otherwise, it's a normal file */
+      /* Not a directory, assumed to be a normal file */
       else
       {
         /* will be used in all cases */
@@ -247,22 +239,22 @@ vector<struct Song*>* traverse_dir (char* begin)
 	/* Skip filenames with no extension */
         if (fn.find('.') == string::npos)
         {
-#ifndef NDEBUG
-          cerr << "DEBUG: skipping extensionless file " << fn << endl;
-#endif
-          delete tmpsong;
-          continue;
-        }
-        
-        else if (fn[fn.length() - 1] == '.')
-        {
-#ifndef NDEBUG
-          cerr << "DEBUG: blank extension for file " << fn << endl;
-#endif
-          delete tmpsong;
+          DEBUG("skipping extensionless file", fn);
+          
+	  delete tmpsong;
           continue;
         }
 
+	/* Extension is there, but nothing */
+        else if (fn[fn.length() - 1] == '.')
+        {
+          DEBUG("blank extension for file", fn);
+
+	  delete tmpsong;
+          continue;
+        }
+
+	/* Valid extension */
 	else
 	{
 	  string::iterator e;
@@ -287,6 +279,7 @@ vector<struct Song*>* traverse_dir (char* begin)
 
           tag = ref.tag();
         
+	  /* Do they both have artist and title fields? */
           if (!tag->artist().isNull() && !tag->title().isNull())
           {
             /* Non-null but empty tag */
@@ -332,22 +325,19 @@ printfn:
 	      htmlify(tmpsong->title);
               all_songs->push_back(tmpsong);
             }
-            else
+            else /* This shouldn't happen, right? We checked for it before */
             {
               delete tmpsong;
               continue;
             }
           }
         }
-        
-#ifndef NDEBUG
-        /* Note that we did not do anything with this file */
+        /* we did not do anything with this file.. */
         else
         {
-          cerr << "DEBUG: skipping unrecognized file " << fn << endl;
+          DEBUG ("skipping unrecognized file", fn);
           delete tmpsong;
         }
-#endif
       }
     }
   }
@@ -364,25 +354,23 @@ printfn:
   return all_songs;
 }
 
+/* Simply purges the entries in a vector. */
 void clean (vector<struct Song *> * root)
 {
   vector<struct Song *>::iterator v;
 
+  /* All strings are on the stack, we don't need to do anything with them */
   for (v = root->begin(); v != root->end(); v++)
     delete *v;
 }
 
+/* Escapes illegal HTML characters into their long counterparts. */
 static void htmlify (string & in)
 {
-  int i;
-  unsigned int c;
-  
-  static char replacechars [] =
-    { '&', '<', '>' };
+  unsigned int c, i;
 
-  static char* replacehtml [] =
-    { "&amp;", "&lt;", "&gt;" };
-
+  /* replace each found character in replacechars by respective 
+   * entry in replacehtml */
   for (c = 0; c < in.length(); c++)
   {
     for (i = 0; i < 3; i++)
@@ -392,6 +380,10 @@ static void htmlify (string & in)
     }
   }
 
+  /* replace spaces with two &nbsp;, it's the slightest bit overkill
+   * i.e. htmlify("  ") should become " &nbsp;", but it becomes
+   * "&nbsp;&nbsp;" */
+  
   while (true)
   {
     unsigned int spacepos;
