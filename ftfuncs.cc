@@ -10,8 +10,10 @@
 using namespace std;
 
 /* TagLib includes */
+#ifdef USE_TAGLIB
 #include <fileref.h>
 #include <tag.h>
+#endif
 
 #ifdef USE_OGG
 #include <vorbis/codec.h>
