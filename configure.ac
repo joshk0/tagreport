@@ -95,9 +95,13 @@ AC_CHECK_HEADER(id3tag.h,
 [
   AC_CHECK_LIB(id3tag, id3_file_tag,
   [
-    AC_DEFINE(USE_ID3TAG, 1, [MAD ID3tag support works.])
-    AC_SUBST(ID3TAGLIB, ["-lid3tag -lz"])
-    use_ID3=1
+    dnl Older versions don't have this.
+    AC_CHECK_LIB(id3tag, id3_frame_field,
+    [
+      AC_DEFINE(USE_ID3TAG, 1, [MAD ID3tag support works.])
+      AC_SUBST(ID3TAGLIB, ["-lid3tag -lz"])
+      use_ID3=1
+    ], , [-lz])
   ], , [-lz])
 ])
 
