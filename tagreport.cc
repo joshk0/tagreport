@@ -100,11 +100,18 @@ void traverse_dir (char* begin)
           fprintf(stderr, "DEBUG: skipping extensionless file %s\n", contents->d_name);
 #endif
           free(fullpath);
-          continue;
         }
         
+	else if (contents->d_name[strlen(contents->d_name) - 1] == '.')
+	{
+#ifdef DEBUG
+          fprintf(stderr, "DEBUG: blank extension for file %s\n", contents->d_name);
+#endif
+	  free(fullpath);
+	}
+
         /* Ogg Vorbis or MP3 file? */
-        if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
+	else if (!strcasecmp(strrchr(contents->d_name, '.') + 1, "ogg")
             || !strcasecmp(strrchr(contents->d_name, '.') + 1, "mp3"))
 	{
           TagLib::FileRef ref (fullpath);
@@ -116,16 +123,37 @@ void traverse_dir (char* begin)
         
 	  if (!tag->artist().isNull() && !tag->title().isNull())
 	  {
-	    printf("%s - %s\n", 
-			  tag->artist().isNull() ? "<none>"
-			  : tag->artist().toCString(),
-			  tag->title().isNull() ? "<none>"
-			  : tag->title().toCString());
+	    if (tag->artist().isEmpty() || tag->title().isEmpty())
+	    {
+	      char *tmp = strrchr(contents->d_name, '.');
+
+	      if (tmp)
+	      {
+		*tmp = '\0';
+		puts(contents->d_name);
+	      }
+	      else
+		abort();
+	    }
+	    else
+	    {
+	      printf("%s - %s\n", tag->artist().toCString(), tag->title().toCString());
+	    }
 	  }
 	  else
 	  {
             /* strip the extension from a filename without ID */
-            puts(strrchr(contents->d_name, '.') - 1);
+	    
+            char* tmp = strrchr(contents->d_name, '.');
+
+	    if (tmp)
+	    {
+	      *tmp  = '\0';
+	      puts(contents->d_name);
+	    }
+	    else
+	      abort(); /* SHOULD NOT HAPPEN */
+	    
 	  }
 	}
         
