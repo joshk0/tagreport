@@ -8,14 +8,22 @@ TagReport installation
 * flex and bison (any recent versions should do)
 * Some kind of getopt implementation. (i.e. libgnugetopt in FreeBSD or as
   part of GNU libc)
+
+At least one of the following:
+
 * libFLAC (part of the flac distribution) if you want FLAC support
   Retrievable at http://flac.sourceforge.net or libflac-dev in Debian
+* libvorbisfile. Part of libvorbis-dev in Debian or at:
+    http://xiph.org/ogg/vorbis/download.html
+* libid3tag. Part of libid3tag0-dev in Debian or at:
+    http://www.mars.org/home/rob/proj/mpeg/
 * TagLib. Please retrieve the source from:
 
     http://ktown.kde.org/~wheeler/taglib/taglib-cvs.tar.gz
 
   There has not been a formal release yet. It's highly alpha code, and
-  does not even build on Solaris. So watch out!
+  does not even build on Solaris. So watch out! TagLib provides for when
+  libvorbis and libid3tag are unavailable.
 
 2. Method
 

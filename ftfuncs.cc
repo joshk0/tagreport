@@ -13,6 +13,15 @@ using namespace std;
 #include <fileref.h>
 #include <tag.h>
 
+#ifdef USE_OGG
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
+#endif
+
+#ifdef USE_ID3TAG
+#include <id3tag.h>
+#endif
+
 #ifdef USE_FLAC
 
 /* libFLAC includes */
@@ -47,20 +56,27 @@ bool get_flac (struct Song* flac, const char* path)
       for (; nc > 0; nc--)
       {
         unsigned i;
-        string field;
+        int eq;
+        string field, fname;
 
         /* XXX - no way to get a clean e->entry? */
         for (i = 0; i < e->length; i++)
           field += e->entry[i];
+
+        eq = field.find('=');
+        assert (eq != string::npos);
+        fname = field.substr(0, eq);
         
-        if (field.find("ARTIST=") == 0)
+        if (!strcasecmp(fname.c_str(), "ARTIST"))
         {
           flac->artist = field.substr(7, field.length() - 7);
+          htmlify(flac->artist);
           found_artist = true;
         }
-        else if (field.find("TITLE=") == 0)
+        else if (!strcasecmp(fname.c_str(), "TITLE"))
         {
           flac->title = field.substr(6, field.length() - 6);
+          htmlify(flac->title);
           found_title = true;
         }
        
@@ -127,3 +143,104 @@ bool get_taglib (struct Song * song, const char *path)
   else /* NO TAG! */
     return false;
 }
+
+#ifdef USE_OGG
+/* This is much like the FLAC support because both use the Vorbis comment
+ * format. */
+bool get_ogg (struct Song * ogg, const char * path)
+{
+  OggVorbis_File ov;
+  FILE* of;
+  int i;
+  bool found_title = false, found_artist = false;
+
+  if ((of = fopen(path, "r")) == NULL)
+  {
+    perror("fopen");
+    return false;
+  }
+
+  if (ov_open (of, &ov, NULL, -1) < 0)
+  {
+    fclose(of);
+    return false;
+  }
+
+  /* ogg->seconds = (long)ov_time_total(&ov, -1) */;
+  
+  for (i = 0; i < ov.vc->comments; i++)
+  {
+    string field = ov.vc->user_comments[i], fname;
+    int e = field.find('=');
+    assert (e != string::npos);
+    fname = field.substr(0, e);
+    
+    if (!strcasecmp(fname.c_str(), "ARTIST"))
+    {
+      ogg->artist = field.substr(7, field.length() - 7);
+      htmlify(ogg->artist);
+      found_artist = true;
+    }
+    else if (!strcasecmp(fname.c_str(), "TITLE"))
+    {
+      ogg->title = field.substr(6, field.length() - 6);
+      htmlify(ogg->title);
+      found_title = true;
+    }
+       
+    if (found_artist && found_title)
+    {
+      ov_clear (&ov);
+      return true;
+    }
+  }
+
+  ov_clear (&ov);
+  return true;
+}
+#endif
+
+#ifdef USE_ID3TAG
+bool get_mp3 (struct Song *mp3, const char* path)
+{
+  struct id3_file *m = NULL;
+  struct id3_tag *tag = NULL;
+  union id3_field *field = NULL;
+  struct id3_frame *frame = NULL;
+  const id3_ucs4_t *str = NULL;
+
+  /* The program will think up the right title :) */
+  if (!(m = id3_file_open (path, ID3_FILE_MODE_READONLY)))
+    return true;
+  
+  if (!(tag = id3_file_tag (m)))
+    return true;
+  
+  if ((frame = id3_tag_findframe (tag, ID3_FRAME_TITLE, 0)))
+  {
+    if ((field = id3_frame_field (frame, 1)))
+    {
+      if ((str = id3_field_getstrings (field, 0)))
+      {
+        mp3->title = (const char*) id3_ucs4_latin1duplicate(str);
+        htmlify(mp3->title);
+      }
+    }
+  }
+
+  if ((frame = id3_tag_findframe (tag, ID3_FRAME_ARTIST, 0)))
+  {
+    if ((field = id3_frame_field (frame, 1)))
+    {
+      if ((str = id3_field_getstrings (field, 0)))
+      {
+        mp3->artist = (const char*) id3_ucs4_latin1duplicate(str);
+        htmlify(mp3->artist);
+      }
+    }
+  }
+  
+  id3_file_close (m);
+  return true;
+}
+#endif

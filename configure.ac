@@ -2,6 +2,11 @@ AC_INIT(TagReport, [0.01a])
 
 AC_CONFIG_HEADER([config.h])
 
+use_FLAC=0
+use_OGG=0
+use_ID3=0
+use_TAGLIB=0
+
 AC_PROG_CXX
 
 AC_LANG(C++)
@@ -66,6 +71,32 @@ AC_CHECK_HEADER([FLAC/metadata.h],
   [
     AC_DEFINE(USE_FLAC, 1, [FLAC support works. Don't change!])
     AC_SUBST(FLACLIB, -lFLAC)
+    use_FLAC=1
+  ])
+])
+
+AC_CHECK_HEADER(vorbis/codec.h,
+[
+  AC_CHECK_HEADER(vorbis/vorbisfile.h,
+  [
+    AC_CHECK_LIB(vorbisfile, ov_open,
+    [
+      AC_DEFINE(USE_OGG, 1, [Ogg Vorbis support works.])
+      dnl Really, it's the user's problem if they have libvorbisfile
+      dnl and not libvorbis and libogg too.
+      AC_SUBST(OGGLIB, ["-lvorbisfile -lvorbis -logg"])
+      use_OGG=1
+    ], , [-lvorbis -logg])
+  ]) 
+])
+
+AC_CHECK_HEADER(id3tag.h,
+[
+  AC_CHECK_LIB(id3tag, id3_file_tag,
+  [
+    AC_DEFINE(USE_ID3TAG, 1, [MAD ID3tag support works.])
+    AC_SUBST(ID3TAGLIB, ["-lid3tag -lz"])
+    use_ID3=1
   ])
 ])
 
@@ -74,8 +105,49 @@ AC_CHECK_HEADERS([getopt.h libiberty.h])
 
 AC_SUBST(DOCBOOK)
 
-AC_CHECK_HEADERS([fileref.h tag.h], ,
-  [AC_MSG_ERROR([Missing some TagLib headers, is your install complete?])])
+AC_CHECK_HEADERS([fileref.h tag.h],
+[
+  AC_DEFINE(USE_TAGLIB, 1, [TagLib support works.])
+  use_TAGLIB=1
+])
+
+
+if test $use_OGG -eq 1; then
+  yes_OGG="yes"
+else
+  yes_OGG="no"
+fi
+
+if test $use_ID3 -eq 1; then
+  yes_ID3="yes"
+else
+  yes_ID3="no"
+fi
+
+if test $use_TAGLIB -eq 1; then
+  yes_TAGLIB="yes"
+else
+  yes_TAGLIB="no"
+fi
+
+if test $use_FLAC -eq 1; then
+  yes_FLAC="yes"
+else
+  yes_FLAC="no"
+fi
+
+echo
+echo "TagReport $PACKAGE_VERSION"
+echo
+echo "libflac support .............. $yes_FLAC"
+echo "TagLib support ............... $yes_TAGLIB"
+echo "libvorbisfile support ........ $yes_OGG"
+echo "libid3tag support ............ $yes_ID3"
+echo
+
+if test $use_TAGLIB -eq 0 && test $use_OGG -eq 0 ] && test $use_ID3 -eq 0 && test $use_FLAC -eq 0; then
+  AC_MSG_ERROR([You need to install at least one of the following: taglib, libvorbisfile, id3tag, libflac.])
+fi
 
 CXXFLAGS="$save_CXXFLAGS"
 CPPFLAGS="$save_CPPFLAGS"
@@ -83,3 +155,6 @@ CPPFLAGS="$save_CPPFLAGS"
 AC_CONFIG_FILES(Makefile)
 
 AC_OUTPUT
+
+echo
+echo "Type 'make' to begin the build."

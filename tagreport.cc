@@ -377,6 +377,8 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
     return false;
   }
 
+  bool (*getfunc)(struct Song*, const char*);
+  
   /* Valid extension */
   string::iterator e;
   
@@ -387,38 +389,55 @@ bool get_artist_title (struct Song * song, string fn, char * begin)
   for (e = ext.begin(); e != ext.end(); e++)
     *e = tolower(*e);
 
+  /* Choose which function to use. */
 #ifdef USE_FLAC
-  if (ext == "flac") /* Free Lossless Audio Codec - no TagLib support */
+  if (ext == "flac")
   {
-    if (!get_flac(song, fn.c_str()) ||
-        (song->title == "" && song->artist == ""))
-    {
-      song->title = NOPATHEXT(fn, begin);
-      htmlify(song->title);
-    }
-    
-    return true;
+    getfunc = &get_flac;
+    goto skipextcheck;
   }
-  
-  /* Ogg Vorbis or MP3 file? */
-  else if (ext == "ogg" || ext == "mp3")
-#else
-  if (ext == "ogg" || ext == "mp3")
 #endif
+#ifdef USE_OGG
+  if (ext == "ogg")
   {
-    if (!get_taglib(song, fn.c_str()) ||
-        (song->title == "" && song->artist == ""))
-    {
-      song->title = NOPATHEXT(fn, begin);
-      htmlify(song->title);
-    }
-
-    return true;
+    getfunc = &get_ogg;
+    goto skipextcheck;
   }
-  /* we did not do anything with this file.. */
+#endif
+#ifdef USE_ID3TAG
+  if (ext == "mp3")
+  {
+    getfunc = &get_mp3;
+    goto skipextcheck;
+  }
+#endif
+#if !defined(USE_ID3TAG) && defined(USE_TAGLIB)
+  if (ext == "mp3")
+  {
+    getfunc = &get_taglib;
+    goto skipextcheck;
+  }
+#endif
+#if !defined(USE_OGG) && defined(USE_TAGLIB)
+  if (ext == "ogg")
+  {
+    getfunc = &get_taglib;
+    goto skipextcheck;
+  }
+#endif
   else
   {
      DEBUG ("skipping unrecognized file", fn);
      return false;
   }
+
+skipextcheck:
+  if (!(*getfunc)(song, fn.c_str()) || 
+      (song->title == "" && song->artist == ""))
+  {
+    song->title = NOPATHEXT(fn, begin);
+    htmlify(song->title);
+  }
+    
+  return true;
 }

@@ -24,11 +24,21 @@ struct Song
 };
 
 const char usage[] = \
-"TagReport " PACKAGE_VERSION 
+"TagReport " PACKAGE_VERSION " ( "
 #ifdef USE_FLAC
-" (+FLAC)"
+"libflac "
 #endif
-" by Joshua Kwan <joshk@triplehelix.org>\n\
+#ifdef USE_OGG
+"libvorbisfile "
+#endif
+#ifdef USE_TAGLIB
+"taglib "
+#endif
+#ifdef USE_ID3TAG
+"id3tag "
+#endif
+")\n"
+"by Joshua Kwan <joshk@triplehelix.org>\n\
 Syntax: tagreport [-h] [-v] [-t template] [-o output] directory ...\n"
 #ifdef HAVE_GETOPT_LONG
 "Options:\n\

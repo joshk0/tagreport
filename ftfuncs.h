@@ -10,6 +10,16 @@
 bool get_flac (struct Song* song, const char* path);
 #endif
 
-bool get_taglib(struct Song* song, const char* path);
-
+#ifdef USE_OGG
+bool get_ogg (struct Song * ogg, const char * path);
 #endif
+
+#ifdef USE_ID3TAG
+bool get_mp3 (struct Song * mp3, const char * path);
+#endif
+
+#ifdef USE_TAGLIB
+bool get_taglib(struct Song* song, const char* path);
+#endif
+
+#endif /* !INCLUDED_ftfuncs_h */

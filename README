@@ -22,6 +22,9 @@ is still in its nascent stages, so cross-platform compatibility is still
 fairly weak. If you need to install this (which you probably do), read the
 INSTALL file for more information.
 
+(And failing this, it may use libvorbisfile and libid3tag if they are
+available on your system. See INSTALL for more details.
+
 It was developed on Linux, the initial target platform for TagLib, but appears
 to work perfectly on FreeBSD as well thus far.
 
