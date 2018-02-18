@@ -17,7 +17,7 @@ Also, the FLAC (Free Lossless Audio Codec) is supported if the libFLAC library
 is available on your system at build time.
 
 It also has support for customizable HTML templates. For more information
-on this simple file format look at def/sample.def.
+on this simple file format look at [def/sample.def](def/sample.def).
 
 It uses the next-generation TagLib by Scott Wheeler to accomplish this, which
 is still in its nascent stages, so cross-platform compatibility is still
